@@ -1,34 +1,97 @@
+<div align="center">
+
+<img src="public/icon.svg" width="96" height="96" alt="Tasbeeh icon" />
+
 # Tasbeeh — Dhikr & Du'a Tracker
 
-A simple, lightweight dhikr and du'a tracker built with React, Vite and Tailwind.
-Everything runs in the browser and all user data stays on the device.
+**Build a consistent daily dhikr habit.**<br />
+The after-salah routine, Asma ul Husna and du'as for every moment, in one calm app.
 
-## Features
+Private · Works offline · Free forever · English & বাংলা
 
-- After-salah adhkar routine with per-item targets and one-tap counting
-- 70+ categorised du'as with search across titles, meanings, transliteration and tags
-- Focus mode for distraction-free recitation, with next/previous navigation
-- Personal collections: favourites, custom du'as, and full surahs fetched from the Quran API
-- Backup & restore to a JSON file
-- Eight themes (including system-follow and light), Bangla/English UI, adjustable Arabic and Latin font sizes
-- Installable PWA that works offline, fonts included
+### [Open the app →](https://mokaramhossain.github.io/Tasbeeh/)
 
-## Local development
+<img src="docs/screenshots/1-home.png" width="30%" alt="Home: Play the routine and Asma ul Husna, one tap each" />&nbsp;
+<img src="docs/screenshots/2-reader.png" width="30%" alt="Al-Malik with Qur'an 59:23, the name highlighted in the verse" />&nbsp;
+<img src="docs/screenshots/4-names.png" width="30%" alt="The ninety-nine names, each with its citation" />
 
-### Prerequisites
-- Node.js 20+
-- npm
+</div>
+
+---
+
+## What it does
+
+### 🕌 The after-salah routine
+- The core adhkar, then Ayatul Kursi and the three Quls, with a target on each.
+- **Play the routine** reads it through in order and starts at the first du'a you have not finished.
+- **Reset for New Salah** starts the next round. What you recited stays in your record.
+
+### 💠 Asma ul Husna
+- All ninety-nine names in Arabic, with the meaning and a pronunciation guide in English and Bangla.
+- **Each name shows where it is found.** 70 names show the verse they are said in, the Arabic with the name picked out and a translation beside it. The other 29, which the Qur'an has only as a verb or not at all, cite the narration that lists them (at-Tirmidhi 3507).
+- One button on Home resumes at the last name you read, counts your rounds for the day, and has its own reset.
+
+### 🤲 Du'as for every moment
+- 71 du'as and 6 occasion du'as across 23 categories, each with its source.
+- Search across titles, meanings, pronunciation and the Arabic itself.
+- Home suggests what fits right now: morning, evening, Friday, Ramadan, the last ten nights, Eid and the Day of Arafah. Hijri dates are calculated, and you can correct them by a day to match your local moon sighting.
+
+### 📖 Reading and your own collection
+- A focus mode for reading without distraction: swipe between du'as, adjust the text size, and tap to count.
+- Save favourites into your own collections, write your own du'as, or add any of the 114 surahs.
+- A hadith of the day and a short reflection.
+
+### 📅 Your record
+- A calendar of the days you remembered Allah, your all-time count and what you recite most.
+- No streaks to break. You can switch the record off entirely.
+
+### 🔒 Private by design
+- Everything stays on your phone. No account, no analytics, no tracking, no ads.
+- Works fully offline once installed, fonts included.
+- Back up and restore your data as a single file.
+
+## Install it on your phone
+
+It installs from the browser, with no app store needed:
+
+| iPhone (Safari) | Android (Chrome) |
+| --- | --- |
+| Open the app link, tap **Share**, then **Add to Home Screen**. | Open the app link, tap **⋮**, then **Install app** or **Add to Home screen**. |
+
+Open it once from the home screen while online, and it works offline from then on.
+
+## Sources and content standards
+
+This app is used for worship, so a mistake in its content is worse than a bug in its code.
+
+- **No virtue claim without a citation**, and no citation upgraded to one that merely seems to fit.
+- **Translations have a named source or a native speaker's review.** Machine translation of religious text is not accepted, and pronunciation guides are never generated.
+- **The verses under the names:** Arabic from [Tanzil](https://tanzil.net); English, Sahih International; Bangla, Dr. Abu Bakr Muhammad Zakaria (King Fahd Complex). The only changes are removing the bismillah that the dataset attaches to verse 1, and Zakaria's footnote markers, since the footnotes are not included. `npm run data:verify-names` checks every cited verse against the Qur'an text.
+
+The full rules are in [CONTRIBUTING.md](CONTRIBUTING.md). If you find a mistake, please [open an issue](https://github.com/mokaramhossain/Tasbeeh/issues).
+
+## Contributing
+
+Corrections to content, translations (a new language is one file) and code are all welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) first.
+
+## Licence
+
+Free software under [GPL-3.0-or-later](LICENSE). Anyone may use and change it, and any distributed version must stay open source.
+
+---
+
+## For developers
+
+Built with React, Vite and Tailwind as an installable, offline-first web app. All data lives in the browser.
 
 ### Run locally
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-2. Start the development server:
-   ```bash
-   npm run dev
-   ```
-3. Open the local URL shown in the terminal.
+
+Requires Node.js 22 (see `.node-version`) and npm.
+
+```bash
+npm install
+npm run dev      # http://localhost:3000, also reachable from other devices on your network
+```
 
 ### Scripts
 
@@ -38,56 +101,26 @@ Everything runs in the browser and all user data stays on the device.
 | `npm run build` | Production build into `dist/` |
 | `npm run preview` | Serve the production build locally |
 | `npm run lint` | Type-check the project (`tsc --noEmit`, strict mode) |
+| `npm test` | Content tests: ids, citations, verse data, backup coverage |
 | `npm run i18n:report` | Translation coverage: missing UI keys and content fields |
+| `npm run data:names` | Regenerate `src/data/asmaulHusna.ts` from `scripts/names.mjs` |
+| `npm run data:name-verses` | Regenerate the verses under the names |
+| `npm run data:verify-names` | Check each cited verse contains its name |
+| `npm run shots` | Regenerate the screenshots from the real app |
 | `npm run clean` | Remove `dist/` |
 
-## Testing on a phone
+### Deploying
 
-### Option 1 — the deployed build (needed for install and offline)
+Pushing to `main` (or running **Deploy to GitHub Pages** from the Actions tab on `main`) builds the app with `.github/workflows/deploy.yml` and publishes it to <https://mokaramhossain.github.io/Tasbeeh/>. Only `main` may deploy; the `github-pages` environment rejects other branches.
 
-Pushing to `main` (or running the workflow from the **Actions** tab) builds the
-app via `.github/workflows/deploy.yml` and publishes it to GitHub Pages:
+Pages serves from `/<repo-name>/`, so the workflow builds with `VITE_BASE=/<repo-name>/`. The same source serves from a domain root when `VITE_BASE` is unset.
 
-```
-https://mokaramhossain.github.io/Tasbeeh/
-```
+### Testing on a phone
 
-The workflow enables Pages itself on first run. This requires the repository to
-be **public** — GitHub Pages cannot publish a private repository on the free
-plan.
+- **The deployed build** is needed to test installing and offline use. Add it to the home screen, open it once, then turn on airplane mode and reopen it.
+- **The dev server over Wi-Fi** (`http://<your-computer's-ip>:3000`) is fine for layout and touch checks, but cannot test install or offline: service workers only run in a secure context, and a plain `http://` LAN address is not one.
 
-Because Pages serves from `/<repo-name>/` rather than the domain root, the
-workflow builds with `VITE_BASE=/<repo-name>/` so asset URLs and the
-service-worker scope carry that prefix.
-
-Open the URL on the phone to test everything, including installing the app and
-running it offline. To check offline mode:
-
-1. Open the URL, then use *Add to Home Screen* (Share menu on iOS, ⋮ menu on Android).
-2. Open the app once from the home screen so the service worker caches the assets.
-3. Turn on airplane mode and reopen it — the app should load normally, with the
-   Arabic typeface intact (Google Fonts are runtime-cached).
-
-### Option 2 — the dev server over Wi-Fi (UI checks only)
-
-`npm run dev` binds `0.0.0.0:3000`, so with the phone on the same network:
-
-```bash
-npm run dev
-# find your computer's LAN IP:
-#   macOS/Linux: ipconfig getifaddr en0   or   hostname -I
-#   Windows:     ipconfig
-# then open http://<that-ip>:3000 on the phone
-```
-
-Useful for checking layout, fonts and touch targets with live reload.
-
-**This cannot test install or offline mode.** Service workers only run in a
-secure context, and a plain `http://192.168.x.x` address is not one, so the
-service worker never registers. That is browser policy, not a bug in the app —
-use option 1 for anything PWA-related.
-
-## Project layout
+### Project layout
 
 ```
 src/
@@ -96,63 +129,21 @@ src/
   locales/           Language registry (index.ts) and one file per language
   theme.ts           Theme palettes and CSS variable application
   components/        Presentational components
-  screens/           Adhkar / Du'a / Personal / More tabs
-  data/              Adhkar, du'as, surah list, categories, hadiths
-  hooks/             Back-button history handling
+  screens/           Home, Du'a, Saved and More tabs
+  data/              Adhkar, du'as, names and their verses, categories, hadiths
+  hooks/             Back-button history, wake lock
   utils/             Storage, dates, search, counts, backup
+scripts/             Data builds, verification, screenshots
+tests/               Content tests
 ```
 
-## Notes
+### Technical notes
 
-- User data is stored locally in the browser/app storage under `dhikr-*` keys.
-  `src/utils/backup.ts` lists every key that is included in an export.
-- Reads of stored data are validated and fall back to defaults, so a corrupt
-  entry cannot brick the app; an error boundary provides a recovery screen.
-- Day counts are pruned to the most recent 400 days so storage cannot grow
-  without bound.
-- A new deploy does not silently swap itself in. The service worker is
-  registered in `prompt` mode, so a newer build installs and waits, and
-  `src/components/UpdatePrompt.tsx` offers a **Reload** bar — one tap, rather
-  than the two page loads a self-updating worker needs before its changes are
-  visible. An open app re-checks hourly. Reloading is never automatic: someone
-  may be mid-recitation with a count on screen.
-
-  The change to `prompt` mode takes one transition to land. Anyone who already
-  has the old self-updating worker installed will need to open the app twice
-  after this release; from then on they get the prompt.
-- The base path is set from the `VITE_BASE` env var at build time, so the same
-  source serves correctly from a domain root (local preview, or a host like
-  Cloudflare Pages) and from a sub-path (GitHub Pages). It defaults to `/`.
-- Languages are defined in `src/locales/index.ts`. Each entry carries the
-  language tag, native label, text direction, numerals, font stack and script,
-  and the UI strings live in `src/locales/<code>.ts` keyed by their English
-  text — so a missing translation falls back to readable English. Item content
-  (titles, meanings, benefits) stays beside each item in `src/data`. Adding a
-  language means adding one file and one registry entry;
-  `npm run i18n:report` shows what is still missing. See `CONTRIBUTING.md`.
-- Transliteration is only shown when it is written in the reader's own script.
-  71 of the 83 items store the Latin transliteration under both languages, which
-  is unreadable for someone using the Bangla interface, so it is hidden there
-  until Bengali-script versions exist.
-- The app version shown in About comes from `package.json` at build time
-  (`__APP_VERSION__`), so a release is a single edit.
-- **Reminders are not built, and cannot be on the web.** The Notification
-  Triggers API that would schedule a local notification was abandoned by
-  Google; iOS has no equivalent and its web push needs a push server, which
-  would contradict the app being offline-only with nothing leaving the device;
-  and Periodic Background Sync is Chromium-only, install-only, and fires on
-  ~12-hour heuristics rather than at a chosen time. A reminder built here would
-  only fire while the app was already open, which is not a reminder. It belongs
-  in the Android build, where local notifications schedule properly and offline.
-- **Hijri dates are calculated, never asserted.** `Intl` with the
-  `islamic-umalqura` calendar gives the date with no library and no location.
-  But that calendar is calculated and local moon sighting commonly differs by a
-  day, so the app names a period ("the last ten nights") rather than claiming a
-  date, and Settings carries a ±1 day correction the reader sets themselves.
-  Asking the device where it is would cost privacy and still be a guess.
-- The visible brand is **Qubeq**, but the Android application id is
-  `com.moizit.dhikrtracker`. This is deliberate: an application id can never be
-  changed once an app is published on Google Play, so it is left as-is. Decide
-  before the first submission whether to keep it or start fresh under a
-  `com.qubeq.*` id — after publishing, that choice is permanent.
-- For Android and iOS packaging, this web build can be wrapped later with Capacitor.
+- **Storage.** User data is stored under `dhikr-*` keys. `src/utils/backup.ts` lists every key included in a backup, and a test fails if a stored key is missing from it. Reads are validated and fall back to defaults, so a corrupt entry cannot break the app, and an error boundary offers a recovery screen. Day counts are pruned to the last 400 days.
+- **Updates.** The service worker runs in `prompt` mode: a new build installs and waits, and a **Reload** bar offers it. Reloading is never automatic, because someone may be mid-recitation with a count on screen. An open app re-checks hourly.
+- **Offline.** The Scheherazade New and Lora fonts are bundled and precached, so the Arabic renders correctly on a first offline start. Screenshots and the share image are excluded from the offline cache.
+- **Languages.** Each language is one entry in `src/locales/index.ts` (tag, label, direction, numerals, font stack) and one strings file keyed by the English text, so a missing translation falls back to readable English. Item content stays beside each item in `src/data`. Transliteration is only shown when it is written in the reader's own script.
+- **Hijri dates are calculated, never asserted.** `Intl` with the `islamic-umalqura` calendar gives the date with no library and no location. Local moon sighting often differs by a day, so the app names a period ("the last ten nights") rather than claiming a date, and Settings carries the reader's own correction.
+- **No reminders on the web.** Scheduled local notifications are not available to web apps (the Notification Triggers API was abandoned), and web push would need a server, which would contradict an offline app where nothing leaves the device. Reminders belong in a native Android build.
+- **Version.** The version shown in About comes from `package.json` at build time.
+- **Android.** The Play Store listing uses the application id `com.moizit.dhikrtracker`. An application id can never change once published, so a separate new Play Store app would need a new id.
