@@ -70,6 +70,7 @@ import BackupModal from './components/BackupModal';
 import UpdatePrompt from './components/UpdatePrompt';
 import FirstRunSetup from './components/FirstRunSetup';
 import InstallPrompt from './components/InstallPrompt';
+import type { RecentEntry } from './components/CollectionRow';
 import useBackNavigation from './hooks/useBackNavigation';
 
 // Screens
@@ -85,6 +86,7 @@ type PersonalSection = { id: string; name: LocalizedText };
 type ConfirmAction =
   | { type: 'reset-all' }
   | { type: 'reset-routine' }
+  | { type: 'reset-names' }
   | { type: 'delete-item'; id: string }
   | { type: 'delete-section'; id: string };
 
@@ -132,6 +134,10 @@ const EMPTY_DRAFT: ManualDraft = {
 
 const DEFAULT_SECTIONS: PersonalSection[] = [{ id: 'all', name: 'All Items' }];
 
+/** The category the names are filed under, and their recent-list entry. */
+const NAMES_KEY = 'names';
+const recentKey = (id: string) => (isAsmaId(id) ? `${CATEGORY_PIN}${NAMES_KEY}` : id);
+
 /** Reads one language out of a stored value without falling back to the other. */
 const localeField = (value: LocalizedText | undefined, lang: Language): string =>
   typeof value === 'string' ? value : value?.[lang] ?? '';
@@ -151,6 +157,9 @@ const TARGET_PRESETS = [3, 7, 11, 33, 101, 999];
 
 /** Set once the raised reading defaults have been taken up. */
 const TYPE_DEFAULTS_KEY = 'dhikr-type-defaults-v2';
+
+/** Set once "Continue to the next" has been switched on for an existing profile. */
+const AUTO_ADVANCE_DEFAULT_KEY = 'dhikr-auto-advance-default-v1';
 
 /**
  * A stored size that is still exactly the old default is one nobody chose.
@@ -296,10 +305,18 @@ export default function App() {
   );
   const [isHapticEnabled, setIsHapticEnabled] = useState<boolean>(() => readJSON('dhikr-haptic-v1', true));
   const [isSoundEnabled, setIsSoundEnabled] = useState<boolean>(() => readJSON('dhikr-sound-v1', false));
-  // Off by default: finishing a dhikr and having the page turn under you is a
-  // surprise, and someone who wants to sit with the last repetition should not
-  // have to race it.
-  const [autoAdvance, setAutoAdvance] = useState<boolean>(() => readJSON('dhikr-auto-advance-v1', false));
+  /*
+   * On by default: finishing a count and moving on is what a routine is.
+   *
+   * It used to default to off, and every setting is written on first render,
+   * so every existing profile holds `false` whether or not anyone chose it.
+   * Those are switched on once, the same way the reading sizes were raised; a
+   * reader who then turns it off keeps it off. Restoring a backup never clears
+   * the marker, so an older backup's choice is kept as it was.
+   */
+  const [autoAdvance, setAutoAdvance] = useState<boolean>(() =>
+    readJSON(AUTO_ADVANCE_DEFAULT_KEY, false) ? readJSON('dhikr-auto-advance-v1', true) : true
+  );
   /*
    * Reading sizes, raised once for everyone who never chose their own.
    *
@@ -324,7 +341,13 @@ export default function App() {
   const [showTranslation, setShowTranslation] = useState<boolean>(() => readJSON('dhikr-show-translation-v1', true));
   // Most people return to the same handful of du'as; this saves hunting for
   // them again. Ids only, newest first, capped.
-  const [recentIds, setRecentIds] = useState<string[]>(() => readJSON<string[]>('dhikr-recent-v1', [], isStringArray));
+  //
+  // The names are kept as one entry, `cat:names`, rather than one per name:
+  // reading through the ninety-nine filled "Recently read" with names and
+  // pushed everything else out. Lists stored before that are folded on read.
+  const [recentIds, setRecentIds] = useState<string[]>(() => [
+    ...new Set(readJSON<string[]>('dhikr-recent-v1', [], isStringArray).map(recentKey))
+  ]);
   const [shareStatus, setShareStatus] = useState<string | null>(null);
   const [updatePending, setUpdatePending] = useState(false);
   // Re-evaluated on the same signals as the date rollover — reopening the app,
@@ -481,6 +504,7 @@ export default function App() {
   // Written after the sizes have been read, so the raised defaults are taken up
   // exactly once per profile.
   useEffect(() => { writeJSON(TYPE_DEFAULTS_KEY, true); }, []);
+  useEffect(() => { writeJSON(AUTO_ADVANCE_DEFAULT_KEY, true); }, []);
   useEffect(() => { writeJSON('dhikr-show-transliteration-v1', showTransliteration); }, [showTransliteration]);
   useEffect(() => { writeJSON('dhikr-show-translation-v1', showTranslation); }, [showTranslation]);
   useEffect(() => { writeJSON('dhikr-recent-v1', recentIds); }, [recentIds]);
@@ -769,11 +793,6 @@ export default function App() {
     [nowSlot, itemsById]
   );
 
-  const recentItems = useMemo(
-    () => recentIds.map((id) => itemsById.get(id)).filter(Boolean) as DhikrItem[],
-    [recentIds, itemsById]
-  );
-
   const handleShare = useCallback(
     async (item: DhikrItem) => {
       const text = formatDuaAsText(item, t, PLAY_STORE_URL);
@@ -901,7 +920,18 @@ export default function App() {
   /** The same, for the Saved tab. */
   const favouriteCollections = useMemo(() => resolveCollections(favorites), [favorites, resolveCollections]);
 
-
+  /** Recently read, with the names as one entry that resumes where it was left. */
+  const recentEntries = useMemo(
+    () =>
+      recentIds.flatMap((id): RecentEntry[] => {
+        if (id.startsWith(CATEGORY_PIN)) {
+          return resolveCollections([id]).map((collection) => ({ kind: 'collection', collection }));
+        }
+        const item = itemsById.get(id);
+        return item ? [{ kind: 'item', item }] : [];
+      }),
+    [recentIds, itemsById, resolveCollections]
+  );
 
   const toggleFavorite = useCallback(
     (id: string) => {
@@ -1003,6 +1033,25 @@ export default function App() {
     });
   }, [askConfirm, t]);
 
+  /**
+   * Start the names again: their place, their counters for today and today's
+   * rounds, and nothing else. As with every reset, the Record keeps what was
+   * recited.
+   *
+   * The names only, not any category. A du'a has one counter wherever it is
+   * shown, and 68 du'as sit in more than one category, so resetting Daily
+   * would also clear a du'a counted from Guidance. The names belong to no
+   * other category, so resetting them can only ever touch them.
+   */
+  const handleResetNames = useCallback(() => {
+    askConfirm(
+      // A placeholder rather than "Reset" + name: Bangla puts the verb last.
+      t('Reset {name}?').replace('{name}', t(CATEGORY_LABELS[NAMES_KEY])),
+      t('Starts again from the first, with its counters at zero. Your record keeps what you have already recited.'),
+      { type: 'reset-names' }
+    );
+  }, [askConfirm, t]);
+
   const handleDeletePersonalItem = useCallback(
     (id: string) => {
       askConfirm(t('Delete Item?'), t('Are you sure you want to remove this item from your collection?'), {
@@ -1040,6 +1089,15 @@ export default function App() {
         routineIds.forEach((id) => { values[id] = raw[id] || 0; });
         return { date: currentDate, values };
       });
+    } else if (action.type === 'reset-names') {
+      const ids = [...ASMA_DATA.map((item) => item.id), ASMA_CYCLE_ITEM.id];
+      setResetBaseline((prev) => {
+        const raw = counts[currentDate] || {};
+        const values = prev.date === currentDate ? { ...prev.values } : {};
+        ids.forEach((id) => { values[id] = raw[id] || 0; });
+        return { date: currentDate, values };
+      });
+      setReadingPositions((prev) => ({ ...prev, [NAMES_KEY]: 0 }));
     } else if (action.type === 'delete-item') {
       setCustomItems((prev) => prev.filter((item) => item.id !== action.id));
       setFavorites((prev) => prev.filter((id) => id !== action.id));
@@ -1060,7 +1118,7 @@ export default function App() {
     }
 
     closeOverlay();
-  }, [overlay, currentDate, routineIds, closeOverlay]);
+  }, [overlay, counts, currentDate, routineIds, closeOverlay]);
 
   const handleMoveToCollection = useCallback((itemId: string, sectionId: string) => {
     setCustomItems((prev) => prev.map((item) => (item.id === itemId ? { ...item, sectionId } : item)));
@@ -1214,7 +1272,8 @@ export default function App() {
   );
 
   const rememberRead = useCallback((id: string) => {
-    setRecentIds((prev) => [id, ...prev.filter((entry) => entry !== id)].slice(0, 12));
+    const key = recentKey(id);
+    setRecentIds((prev) => [key, ...prev.filter((entry) => entry !== key)].slice(0, 12));
   }, []);
 
   const openFocus = useCallback((
@@ -1230,7 +1289,12 @@ export default function App() {
     // stopping dead at the ninety-ninth. Derived from the list itself, so no
     // screen has to know about it.
     const cycle = ids.length > 1 && ids.every(isAsmaId);
-    setOverlay({ kind: 'focus', ids, index, cycle, category, playthrough });
+    // Opening one name from the full list of ninety-nine is reading the set,
+    // so it keeps the set's place too: "Continue from" on Home and in Recently
+    // read then points at the last name actually read, however it was reached.
+    // Only the full list — an index into search results means nothing there.
+    const key = category ?? (cycle && ids.length === ASMA_DATA.length ? NAMES_KEY : undefined);
+    setOverlay({ kind: 'focus', ids, index, cycle, category: key, playthrough });
   }, [rememberRead]);
 
   /**
@@ -1280,6 +1344,18 @@ export default function App() {
       openFocus(items[index], items, key, true);
     },
     [readingPositions, openFocus]
+  );
+
+  /**
+   * Whether the names have anything to reset today: a place to resume from, a
+   * round, or a counter above zero. Offering "reset" on an untouched set is
+   * noise.
+   */
+  const namesHaveProgress = useMemo(
+    () =>
+      (readingPositions[NAMES_KEY] ?? 0) > 0 ||
+      [...ASMA_DATA.map((item) => item.id), ASMA_CYCLE_ITEM.id].some((id) => (currentCounts[id] || 0) > 0),
+    [readingPositions, currentCounts]
   );
 
   const restartCollection = useCallback((key: string) => {
@@ -1422,15 +1498,16 @@ export default function App() {
     });
   }, [currentDate, language]);
 
-  const overlayShell = 'fixed inset-0 overflow-y-auto bg-bg/90 backdrop-blur-sm';
+  const overlayShell = 'fixed inset-0 overflow-y-auto bg-bg/90 backdrop-blur-sm pt-safe';
   const inputClass =
     'w-full bg-bg border border-border rounded-xl p-3 text-sm text-text-main outline-none focus:border-gold';
   const labelClass = 'block text-[10px] font-bold text-text-sub uppercase mb-1';
 
   return (
     <div className="min-h-screen bg-bg text-text-main font-serif pb-24 transition-colors duration-500">
+      <div className="status-bar-fill" aria-hidden="true" />
       {/* Header */}
-      <header className="relative bg-card border-b border-border px-4 py-6 shadow-sm">
+      <header className="relative bg-card border-b border-border px-4 pb-6 header-safe shadow-sm">
         <div className="flex justify-between items-center max-w-3xl mx-auto">
           <div className="flex items-center gap-3">
             <div className="flex flex-col">
@@ -1502,12 +1579,20 @@ export default function App() {
               currentDate={currentDate}
               rightNowItems={rightNowItems}
               rightNowSlot={nowSlot}
-              pinnedCollections={pinnedCollections}
+              // The names have their own button on Home, so a pinned copy
+              // would only list them twice.
+              pinnedCollections={pinnedCollections.filter((collection) => collection.key !== NAMES_KEY)}
               readingPositions={readingPositions}
               onOpenCollection={openCategory}
               onRestartCollection={restartCollection}
-              onPinNames={() => togglePinCategory('names')}
-              namesPinned={isCategoryPinned('names')}
+              names={{
+                position: Math.min(readingPositions[NAMES_KEY] ?? 0, ASMA_DATA.length - 1),
+                total: ASMA_DATA.length,
+                rounds: currentCounts[ASMA_CYCLE_ITEM.id] || 0,
+                hasProgress: namesHaveProgress,
+                onPlay: () => openCollection(NAMES_KEY),
+                onReset: handleResetNames
+              }}
               onOpenItem={openFocus}
               showTransliteration={showTransliteration}
               showTranslation={showTranslation}
@@ -1527,7 +1612,10 @@ export default function App() {
               filteredItems={filteredDuaItems}
               totalCount={DUA_TAB_DATA.length}
               favoriteItems={duaFavoriteItems}
-              recentItems={recentItems}
+              recentEntries={recentEntries}
+              onResetNames={handleResetNames}
+              namesHaveProgress={namesHaveProgress}
+              readingPositions={readingPositions}
               isFavorite={(id) => favorites.includes(id)}
               isPinned={(id) => pinnedIds.includes(id)}
               onOpen={openFocus}
@@ -2096,7 +2184,7 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[120] overflow-y-auto bg-bg/95 backdrop-blur-md"
+            className="fixed inset-0 z-[120] overflow-y-auto bg-bg/95 backdrop-blur-md pt-safe"
             role="dialog"
             aria-modal="true"
           >
@@ -2114,7 +2202,7 @@ export default function App() {
                 </div>
 
                 <h3 className="text-2xl font-bold text-text-main mb-2">
-                  {t('Enjoying Dhikr Tracker?')}
+                  {t('Enjoying Tasbeeh?')}
                 </h3>
                 <p className="text-sm text-text-sub mb-8 leading-relaxed">
                   {t('Your feedback helps us grow and reach more people. How would you rate your experience?')}

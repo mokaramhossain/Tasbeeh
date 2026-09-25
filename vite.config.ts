@@ -14,7 +14,7 @@ const base = process.env.VITE_BASE ?? '/';
 // Absolute origin for the social preview tags in index.html. Crawlers do not
 // resolve relative paths or the Vite base, so og:image has to be fully
 // qualified. Overridable for a custom domain later.
-const siteUrl = process.env.VITE_SITE_URL ?? 'https://mokaramhossain.github.io/Tasbeeh---Dhikr-Dua-Tracker/';
+const siteUrl = process.env.VITE_SITE_URL ?? 'https://mokaramhossain.github.io/Tasbeeh/';
 
 export default defineConfig({
   base,

@@ -65,7 +65,7 @@ const FirstRunSetup: React.FC<FirstRunSetupProps> = ({
     }`;
 
   return (
-    <div className="fixed inset-0 z-[200] overflow-y-auto bg-bg">
+    <div className="fixed inset-0 z-[200] overflow-y-auto bg-bg pt-safe">
       <div className="mx-auto flex min-h-full w-full max-w-lg flex-col justify-center px-5 py-10">
         <div className="rounded-3xl border border-border bg-card p-6 shadow-xl">
           <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-gold-ink">

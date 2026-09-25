@@ -49,7 +49,7 @@ Pushing to `main` (or running the workflow from the **Actions** tab) builds the
 app via `.github/workflows/deploy.yml` and publishes it to GitHub Pages:
 
 ```
-https://mokaramhossain.github.io/Tasbeeh---Dhikr-Dua-Tracker/
+https://mokaramhossain.github.io/Tasbeeh/
 ```
 
 The workflow enables Pages itself on first run. This requires the repository to

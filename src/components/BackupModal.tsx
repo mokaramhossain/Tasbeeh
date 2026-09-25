@@ -61,7 +61,7 @@ const BackupModal: React.FC<BackupModalProps> = ({ getLocalizedText, onClose, ov
       message:
         result.reason === 'storage-full'
           ? getLocalizedText('Not enough storage space to restore.')
-          : getLocalizedText('That file is not a Dhikr Tracker backup.')
+          : getLocalizedText('That file is not a Tasbeeh backup.')
     });
   };
 

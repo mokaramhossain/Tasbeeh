@@ -3,6 +3,7 @@ import { ADHKAR_DATA, ADHKAR_ROUTINE } from '../src/data/adhkar';
 import { DUA_DATA } from '../src/data/duas';
 import { OCCASION_DATA } from '../src/data/occasions';
 import { ASMA_DATA } from '../src/data/asmaulHusna';
+import { NAME_HIGHLIGHT, NAME_VERSES } from '../src/data/nameVerses.generated';
 import { SURAH_TEXTS } from '../src/data/surahText';
 import { SLOT_ITEMS } from '../src/data/rightNow';
 import { CATEGORY_META } from '../src/data/categories';
@@ -150,5 +151,71 @@ describe('nothing ships half-written', () => {
       .map((v) => `${v.id}.${v.field}.${v.lang}`);
 
     expect([...new Set(found)].sort()).toEqual([...KNOWN_GAPS].sort());
+  });
+});
+
+describe('the names', () => {
+  it('each cites where it is found: a verse, or the narration that lists it', () => {
+    // Every name used to carry 7:180, which is about the names as a whole and
+    // so said nothing about any one of them. The verses themselves are checked
+    // against the Qur'an text by `npm run data:verify-names`.
+    const bad = ASMA_DATA.filter(
+      (item) =>
+        !(item.source === 'Quran' && /^\d{1,3}:\d{1,3}$/.test(item.ref ?? '') && item.ref !== '7:180') &&
+        !(item.source === 'At-Tirmidhi' && item.ref === '3507')
+    ).map((item) => `${item.id}: ${item.source} ${item.ref}`);
+    expect(bad).toEqual([]);
+  });
+
+  it('every name cited to a verse has that verse, whole, in all three texts', () => {
+    const problems = ASMA_DATA.filter((item) => item.source === 'Quran').flatMap((item) => {
+      const verse = NAME_VERSES[item.ref ?? ''];
+      if (!verse) return [`${item.id}: no verse for ${item.ref}`];
+      const out: string[] = [];
+      const texts = { arabic: verse.arabic, en: verse.meaning.en, bn: verse.meaning.bn };
+      Object.entries(texts).forEach(([field, text]) => {
+        if (!text?.trim()) out.push(`${item.ref}.${field}: empty`);
+        // Scripture is never shortened to fit.
+        if (/(\.\.\.|…)/.test(text)) out.push(`${item.ref}.${field}: shortened`);
+      });
+      if (!ARABIC.test(verse.arabic)) out.push(`${item.ref}.arabic: not Arabic`);
+      if (!BENGALI.test(verse.meaning.bn)) out.push(`${item.ref}.bn: not Bengali`);
+      // Zakaria's footnotes are not shipped, so a marker would point at nothing.
+      if (/\[[০-৯0-9]+\]/.test(verse.meaning.bn)) out.push(`${item.ref}.bn: footnote marker`);
+      // The dataset prefixes verse 1 with the bismillah; it is not part of it.
+      if (/^بِسْمِ/.test(verse.arabic) && item.ref !== '1:1') out.push(`${item.ref}.arabic: starts with the bismillah`);
+      const span = NAME_HIGHLIGHT[item.id];
+      const words = verse.arabic.split(' ').length;
+      if (!span || span[0] < 0 || span[1] >= words || span[0] > span[1]) out.push(`${item.id}: highlight out of range`);
+      return out;
+    });
+    expect(problems).toEqual([]);
+  });
+
+  it('names cited to the narration carry no verse', () => {
+    const stray = ASMA_DATA.filter((item) => item.source !== 'Quran' && NAME_HIGHLIGHT[item.id]).map((item) => item.id);
+    expect(stray).toEqual([]);
+  });
+});
+
+describe('backup', () => {
+  it('carries every key the app stores', async () => {
+    // Four keys were each added to storage and not to the backup, and every
+    // time a restore quietly reset that setting. This reads the source for the
+    // keys actually written, so the next one fails here instead.
+    const { readFileSync, readdirSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const { BACKUP_KEYS } = await import('../src/utils/backup');
+    const files = (dir: string): string[] =>
+      readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
+        entry.isDirectory() ? files(join(dir, entry.name)) : /\.tsx?$/.test(entry.name) ? [join(dir, entry.name)] : []
+      );
+    const stored = new Set(
+      files('src').flatMap((file) => [...readFileSync(file, 'utf8').matchAll(/'(dhikr-[a-z0-9-]+-v\d+)'/g)].map((m) => m[1]))
+    );
+    // Read once to migrate an old install, never written.
+    const LEGACY = ['dhikr-tracker-v1'];
+    const carried = new Set<string>([...BACKUP_KEYS, ...LEGACY]);
+    expect([...stored].filter((key) => !carried.has(key)).sort()).toEqual([]);
   });
 });

@@ -134,6 +134,37 @@ body {
 
 .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
 
+/*
+ * The top inset, for an installed iPhone app.
+ *
+ * With `black-translucent` the page is drawn under the status bar and the
+ * Dynamic Island, and nothing made room for it: the header's Reset All and the
+ * reader's close button both sat underneath the island, where they cannot be
+ * tapped. Zero everywhere else, so a browser tab is unchanged.
+ */
+.pt-safe { padding-top: env(safe-area-inset-top); }
+.header-safe { padding-top: calc(env(safe-area-inset-top) + 1.5rem); }
+
+/*
+ * A strip behind the status bar, so the clock is not printed over whatever is
+ * scrolling past. Its colour comes from the theme: the status bar text is
+ * always white under `black-translucent`, so a light theme needs a dark strip.
+ *
+ * Above every overlay, not just the page: the reader and the welcome screen
+ * are opaque and full-screen, and at 60 they covered the strip and put the
+ * white clock back on a light background. It is only as tall as the inset
+ * and takes no pointer events, so nothing beneath it is blocked.
+ */
+.status-bar-fill {
+  position: fixed;
+  inset-inline: 0;
+  top: 0;
+  height: env(safe-area-inset-top);
+  background: var(--status-bar, var(--color-card));
+  z-index: 1000;
+  pointer-events: none;
+}
+
 /* Respect the OS "reduce motion" preference. */
 @media (prefers-reduced-motion: reduce) {
   *,
