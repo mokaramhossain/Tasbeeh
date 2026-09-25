@@ -86,7 +86,7 @@ type PersonalSection = { id: string; name: LocalizedText };
 type ConfirmAction =
   | { type: 'reset-all' }
   | { type: 'reset-routine' }
-  | { type: 'reset-collection'; key: string }
+  | { type: 'reset-names' }
   | { type: 'delete-item'; id: string }
   | { type: 'delete-section'; id: string };
 
@@ -1034,24 +1034,23 @@ export default function App() {
   }, [askConfirm, t]);
 
   /**
-   * Start one collection again — the names, or any category read through.
+   * Start the names again: their place, their counters for today and today's
+   * rounds, and nothing else. As with every reset, the Record keeps what was
+   * recited.
    *
-   * Clears its place and its counters for today, the round marker with the
-   * names, and nothing else: the routine and every other du'a keep their
-   * counts. As with every reset, the Record keeps what was recited.
+   * The names only, not any category. A du'a has one counter wherever it is
+   * shown, and 68 du'as sit in more than one category, so resetting Daily
+   * would also clear a du'a counted from Guidance. The names belong to no
+   * other category, so resetting them can only ever touch them.
    */
-  const handleResetCollection = useCallback(
-    (key: string) => {
-      const name = CATEGORY_LABELS[key] ? t(CATEGORY_LABELS[key]) : key;
-      askConfirm(
-        // A placeholder rather than "Reset" + name: Bangla puts the verb last.
-        t('Reset {name}?').replace('{name}', name),
-        t('Starts again from the first, with its counters at zero. Your record keeps what you have already recited.'),
-        { type: 'reset-collection', key }
-      );
-    },
-    [askConfirm, t]
-  );
+  const handleResetNames = useCallback(() => {
+    askConfirm(
+      // A placeholder rather than "Reset" + name: Bangla puts the verb last.
+      t('Reset {name}?').replace('{name}', t(CATEGORY_LABELS[NAMES_KEY])),
+      t('Starts again from the first, with its counters at zero. Your record keeps what you have already recited.'),
+      { type: 'reset-names' }
+    );
+  }, [askConfirm, t]);
 
   const handleDeletePersonalItem = useCallback(
     (id: string) => {
@@ -1090,16 +1089,15 @@ export default function App() {
         routineIds.forEach((id) => { values[id] = raw[id] || 0; });
         return { date: currentDate, values };
       });
-    } else if (action.type === 'reset-collection') {
-      const ids = DUA_TAB_DATA.filter((item) => item.cat?.includes(action.key)).map((item) => item.id);
-      if (action.key === NAMES_KEY) ids.push(ASMA_CYCLE_ITEM.id);
+    } else if (action.type === 'reset-names') {
+      const ids = [...ASMA_DATA.map((item) => item.id), ASMA_CYCLE_ITEM.id];
       setResetBaseline((prev) => {
         const raw = counts[currentDate] || {};
         const values = prev.date === currentDate ? { ...prev.values } : {};
         ids.forEach((id) => { values[id] = raw[id] || 0; });
         return { date: currentDate, values };
       });
-      setReadingPositions((prev) => ({ ...prev, [action.key]: 0 }));
+      setReadingPositions((prev) => ({ ...prev, [NAMES_KEY]: 0 }));
     } else if (action.type === 'delete-item') {
       setCustomItems((prev) => prev.filter((item) => item.id !== action.id));
       setFavorites((prev) => prev.filter((id) => id !== action.id));
@@ -1349,15 +1347,14 @@ export default function App() {
   );
 
   /**
-   * Whether a collection has anything to reset today: a place to resume from,
-   * or a counter above zero. Offering "reset" on an untouched set is noise.
+   * Whether the names have anything to reset today: a place to resume from, a
+   * round, or a counter above zero. Offering "reset" on an untouched set is
+   * noise.
    */
-  const collectionHasProgress = useCallback(
-    (key: string) => {
-      if ((readingPositions[key] ?? 0) > 0) return true;
-      if (key === NAMES_KEY && (currentCounts[ASMA_CYCLE_ITEM.id] || 0) > 0) return true;
-      return DUA_TAB_DATA.some((item) => item.cat?.includes(key) && (currentCounts[item.id] || 0) > 0);
-    },
+  const namesHaveProgress = useMemo(
+    () =>
+      (readingPositions[NAMES_KEY] ?? 0) > 0 ||
+      [...ASMA_DATA.map((item) => item.id), ASMA_CYCLE_ITEM.id].some((id) => (currentCounts[id] || 0) > 0),
     [readingPositions, currentCounts]
   );
 
@@ -1592,9 +1589,9 @@ export default function App() {
                 position: Math.min(readingPositions[NAMES_KEY] ?? 0, ASMA_DATA.length - 1),
                 total: ASMA_DATA.length,
                 rounds: currentCounts[ASMA_CYCLE_ITEM.id] || 0,
-                hasProgress: collectionHasProgress(NAMES_KEY),
+                hasProgress: namesHaveProgress,
                 onPlay: () => openCollection(NAMES_KEY),
-                onReset: () => handleResetCollection(NAMES_KEY)
+                onReset: handleResetNames
               }}
               onOpenItem={openFocus}
               showTransliteration={showTransliteration}
@@ -1616,8 +1613,8 @@ export default function App() {
               totalCount={DUA_TAB_DATA.length}
               favoriteItems={duaFavoriteItems}
               recentEntries={recentEntries}
-              onResetCategory={handleResetCollection}
-              categoryHasProgress={collectionHasProgress(duaSelectedCategory)}
+              onResetNames={handleResetNames}
+              namesHaveProgress={namesHaveProgress}
               readingPositions={readingPositions}
               isFavorite={(id) => favorites.includes(id)}
               isPinned={(id) => pinnedIds.includes(id)}
@@ -2205,7 +2202,7 @@ export default function App() {
                 </div>
 
                 <h3 className="text-2xl font-bold text-text-main mb-2">
-                  {t('Enjoying Dhikr Tracker?')}
+                  {t('Enjoying Tasbeeh?')}
                 </h3>
                 <p className="text-sm text-text-sub mb-8 leading-relaxed">
                   {t('Your feedback helps us grow and reach more people. How would you rate your experience?')}

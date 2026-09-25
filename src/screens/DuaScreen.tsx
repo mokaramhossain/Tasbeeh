@@ -37,9 +37,9 @@ interface DuaScreenProps {
   /** How many times each du'a in the category is recited before moving on. */
   categoryTarget?: number;
   onEditCategoryTarget?: (category: string) => void;
-  /** Starts one set again: its place and today's counters, nothing else. */
-  onResetCategory?: (category: string) => void;
-  categoryHasProgress?: boolean;
+  /** Starts the names again: their place and today's counters, nothing else. */
+  onResetNames?: () => void;
+  namesHaveProgress?: boolean;
   /** Where each set was left, for "Continue from" on a recent set. */
   readingPositions?: Record<string, number>;
 }
@@ -107,8 +107,8 @@ const DuaScreen: React.FC<DuaScreenProps> = ({
   categoryPosition = 0,
   categoryTarget = 1,
   onEditCategoryTarget,
-  onResetCategory,
-  categoryHasProgress = false,
+  onResetNames,
+  namesHaveProgress = false,
   readingPositions = {}
 }) => {
   const [showAll, setShowAll] = useState(false);
@@ -272,11 +272,11 @@ const DuaScreen: React.FC<DuaScreenProps> = ({
                   ? `${getLocalizedText('Read through')} · ${getLocalizedText('continue from')} ${formatNumber(categoryPosition + 1, language)}`
                   : `${getLocalizedText('Read through')} · ${formatNumber(filteredItems.length, language)} ${noun}`}
               </button>
-              {/* This set only. Reset All in the header clears the whole day,
+              {/* The names only. Reset All in the header clears the whole day,
                   which is not what someone starting the names again means. */}
-              {onResetCategory && categoryHasProgress ? (
+              {selectedCategory === 'names' && onResetNames && namesHaveProgress ? (
                 <button
-                  onClick={() => onResetCategory(selectedCategory)}
+                  onClick={onResetNames}
                   aria-label={`${getLocalizedText('Reset')} ${listTitle}`}
                   title={`${getLocalizedText('Reset')} ${listTitle}`}
                   className="flex min-h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-border bg-card text-text-muted transition-all hover:border-gold/40 hover:text-gold-ink"
@@ -343,7 +343,7 @@ const DuaScreen: React.FC<DuaScreenProps> = ({
                       language={language}
                       getLocalizedText={getLocalizedText}
                       onOpen={(key) => (onReadCategory ? onReadCategory(key) : onCategorySelect(key))}
-                      onRestart={onResetCategory}
+                      onRestart={entry.collection.key === 'names' ? onResetNames : undefined}
                     />
                   ) : (
                     <DuaRow

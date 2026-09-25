@@ -12,9 +12,11 @@ import type { Language } from './locales';
  * `APP_NAME` must match the Play Store title, because it is what a recipient
  * sees next to the link. `APP_SHORT_NAME` is for inside the app, where the
  * reader already knows where they are; it is a UI string, so it is translated.
+ * It is the home-screen name too, which is why it is "Tasbeeh" and not a
+ * shortened form of something else.
  */
 export const APP_NAME = "Tasbeeh — Dhikr & Du'a Tracker";
-export const APP_SHORT_NAME = 'Dhikr Tracker';
+export const APP_SHORT_NAME = 'Tasbeeh';
 
 /**
  * Either a UI string keyed by its English text, or per-language content stored

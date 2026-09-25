@@ -149,6 +149,11 @@ body {
  * A strip behind the status bar, so the clock is not printed over whatever is
  * scrolling past. Its colour comes from the theme: the status bar text is
  * always white under `black-translucent`, so a light theme needs a dark strip.
+ *
+ * Above every overlay, not just the page: the reader and the welcome screen
+ * are opaque and full-screen, and at 60 they covered the strip and put the
+ * white clock back on a light background. It is only as tall as the inset
+ * and takes no pointer events, so nothing beneath it is blocked.
  */
 .status-bar-fill {
   position: fixed;
@@ -156,7 +161,7 @@ body {
   top: 0;
   height: env(safe-area-inset-top);
   background: var(--status-bar, var(--color-card));
-  z-index: 60;
+  z-index: 1000;
   pointer-events: none;
 }
 
