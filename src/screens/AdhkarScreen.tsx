@@ -177,22 +177,18 @@ const AdhkarScreen: React.FC<AdhkarScreenProps> = ({
             <span aria-hidden="true">{slotMeta.icon}</span>
             {getLocalizedText(slotMeta.label)}
           </p>
+          {/* Title only: the strip sits above the routine, and a title such
+              as "Upon Waking Up" already says what the du'a is. The meaning is
+              one tap away, in the reader. */}
           <div className="space-y-2">
             {rightNowItems.map((item) => (
               <button
                 key={item.id}
                 onClick={() => onOpenItem(item, rightNowItems)}
-                className="flex w-full items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3 text-start transition-all hover:border-gold/45 active:scale-[0.995]"
+                className="flex min-h-11 w-full items-center gap-3 rounded-2xl border border-border bg-card px-4 py-2.5 text-start transition-all hover:border-gold/45 active:scale-[0.995]"
               >
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-bold text-text-main">
-                    {getLocalizedText(item.title)}
-                  </span>
-                  {item.meaning ? (
-                    <span className="mt-0.5 block truncate text-xs text-text-sub">
-                      {getLocalizedText(item.meaning)}
-                    </span>
-                  ) : null}
+                <span className="min-w-0 flex-1 truncate text-sm font-bold text-text-main">
+                  {getLocalizedText(item.title)}
                 </span>
                 <ChevronRight size={16} className="shrink-0 text-text-muted" />
               </button>
