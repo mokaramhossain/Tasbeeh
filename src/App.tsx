@@ -158,6 +158,9 @@ const TARGET_PRESETS = [3, 7, 11, 33, 101, 999];
 /** Set once the raised reading defaults have been taken up. */
 const TYPE_DEFAULTS_KEY = 'dhikr-type-defaults-v2';
 
+/** Set once "Continue to the next" has been switched on for an existing profile. */
+const AUTO_ADVANCE_DEFAULT_KEY = 'dhikr-auto-advance-default-v1';
+
 /**
  * A stored size that is still exactly the old default is one nobody chose.
  *
@@ -302,10 +305,18 @@ export default function App() {
   );
   const [isHapticEnabled, setIsHapticEnabled] = useState<boolean>(() => readJSON('dhikr-haptic-v1', true));
   const [isSoundEnabled, setIsSoundEnabled] = useState<boolean>(() => readJSON('dhikr-sound-v1', false));
-  // Off by default: finishing a dhikr and having the page turn under you is a
-  // surprise, and someone who wants to sit with the last repetition should not
-  // have to race it.
-  const [autoAdvance, setAutoAdvance] = useState<boolean>(() => readJSON('dhikr-auto-advance-v1', false));
+  /*
+   * On by default: finishing a count and moving on is what a routine is.
+   *
+   * It used to default to off, and every setting is written on first render,
+   * so every existing profile holds `false` whether or not anyone chose it.
+   * Those are switched on once, the same way the reading sizes were raised; a
+   * reader who then turns it off keeps it off. Restoring a backup never clears
+   * the marker, so an older backup's choice is kept as it was.
+   */
+  const [autoAdvance, setAutoAdvance] = useState<boolean>(() =>
+    readJSON(AUTO_ADVANCE_DEFAULT_KEY, false) ? readJSON('dhikr-auto-advance-v1', true) : true
+  );
   /*
    * Reading sizes, raised once for everyone who never chose their own.
    *
@@ -493,6 +504,7 @@ export default function App() {
   // Written after the sizes have been read, so the raised defaults are taken up
   // exactly once per profile.
   useEffect(() => { writeJSON(TYPE_DEFAULTS_KEY, true); }, []);
+  useEffect(() => { writeJSON(AUTO_ADVANCE_DEFAULT_KEY, true); }, []);
   useEffect(() => { writeJSON('dhikr-show-transliteration-v1', showTransliteration); }, [showTransliteration]);
   useEffect(() => { writeJSON('dhikr-show-translation-v1', showTranslation); }, [showTranslation]);
   useEffect(() => { writeJSON('dhikr-recent-v1', recentIds); }, [recentIds]);
