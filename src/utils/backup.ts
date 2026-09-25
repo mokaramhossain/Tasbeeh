@@ -35,7 +35,10 @@ export const BACKUP_KEYS = [
   'dhikr-setup-done-v1',
   'dhikr-install-hint-v1',
   'dhikr-hijri-offset-v1',
-  'dhikr-visits-v1'
+  'dhikr-visits-v1',
+  // How much of the routine Home carries. Missed when it was added, so a
+  // restore put everyone back on the default scope.
+  'dhikr-routine-scope-v1'
 ] as const;
 
 export interface BackupFile {

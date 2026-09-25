@@ -166,3 +166,25 @@ describe('the names', () => {
     expect(bad).toEqual([]);
   });
 });
+
+describe('backup', () => {
+  it('carries every key the app stores', async () => {
+    // Four keys were each added to storage and not to the backup, and every
+    // time a restore quietly reset that setting. This reads the source for the
+    // keys actually written, so the next one fails here instead.
+    const { readFileSync, readdirSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const { BACKUP_KEYS } = await import('../src/utils/backup');
+    const files = (dir: string): string[] =>
+      readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
+        entry.isDirectory() ? files(join(dir, entry.name)) : /\.tsx?$/.test(entry.name) ? [join(dir, entry.name)] : []
+      );
+    const stored = new Set(
+      files('src').flatMap((file) => [...readFileSync(file, 'utf8').matchAll(/'(dhikr-[a-z0-9-]+-v\d+)'/g)].map((m) => m[1]))
+    );
+    // Read once to migrate an old install, never written.
+    const LEGACY = ['dhikr-tracker-v1'];
+    const carried = new Set<string>([...BACKUP_KEYS, ...LEGACY]);
+    expect([...stored].filter((key) => !carried.has(key)).sort()).toEqual([]);
+  });
+});
