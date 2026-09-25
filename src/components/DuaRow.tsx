@@ -30,15 +30,15 @@ const DuaRow: React.FC<DuaRowProps> = ({
 }) => {
   const meaning = getLocalizedText(item.meaning);
   /*
-   * The names all carry the same citation — Qur'an 7:180, the verse that
-   * establishes the whole set — so printing it ninety-nine times says nothing
-   * and crowds every row. The position in the sequence is what a reader working
-   * through them actually wants; the citation still shows on the open card.
+   * A name's row leads with its place in the sequence, which is what someone
+   * working through them wants, and then where the name is found — each name
+   * cites its own verse, or the narration that lists it.
    */
   const ordinal = isAsmaId(item.id) ? Number(item.id.slice('asma_'.length)) : null;
+  const source = [item.source, item.ref].filter(Boolean).join(' · ');
   const citation = ordinal
-    ? `${formatNumber(ordinal, language)} / ${formatNumber(99, language)}`
-    : [item.source, item.ref].filter(Boolean).join(' · ');
+    ? [`${formatNumber(ordinal, language)} / ${formatNumber(99, language)}`, source].filter(Boolean).join('  ·  ')
+    : source;
 
   return (
     <button

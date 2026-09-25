@@ -16,6 +16,9 @@ export interface Collection {
   items: DhikrItem[];
 }
 
+/** One line of "Recently read": a single du'a, or a set read through. */
+export type RecentEntry = { kind: 'item'; item: DhikrItem } | { kind: 'collection'; collection: Collection };
+
 interface CollectionRowProps {
   collection: Collection;
   /** Where the reader last got to, 0 when unstarted. */

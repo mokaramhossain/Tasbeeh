@@ -152,3 +152,17 @@ describe('nothing ships half-written', () => {
     expect([...new Set(found)].sort()).toEqual([...KNOWN_GAPS].sort());
   });
 });
+
+describe('the names', () => {
+  it('each cites where it is found: a verse, or the narration that lists it', () => {
+    // Every name used to carry 7:180, which is about the names as a whole and
+    // so said nothing about any one of them. The verses themselves are checked
+    // against the Qur'an text by `npm run data:verify-names`.
+    const bad = ASMA_DATA.filter(
+      (item) =>
+        !(item.source === 'Quran' && /^\d{1,3}:\d{1,3}$/.test(item.ref ?? '') && item.ref !== '7:180') &&
+        !(item.source === 'At-Tirmidhi' && item.ref === '3507')
+    ).map((item) => `${item.id}: ${item.source} ${item.ref}`);
+    expect(bad).toEqual([]);
+  });
+});

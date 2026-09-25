@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { ArrowLeft, BookOpen, ChevronDown, Clock3, Heart, LayoutGrid, Pin, Play, Search, Sparkles } from 'lucide-react';
+import { ArrowLeft, BookOpen, ChevronDown, Clock3, Heart, LayoutGrid, Pin, Play, RotateCcw, Search, Sparkles } from 'lucide-react';
 import { DhikrItem, Language, LocalizedText } from '../constants';
 import { CATEGORY_META } from '../data/categories';
 import SearchBar from '../components/SearchBar';
 import CategoryGrid from '../components/CategoryGrid';
 import DuaRow from '../components/DuaRow';
+import CollectionRow, { type RecentEntry } from '../components/CollectionRow';
 import { formatNumber } from '../i18n';
 
 interface DuaScreenProps {
@@ -19,7 +20,8 @@ interface DuaScreenProps {
   filteredItems: DhikrItem[];
   totalCount: number;
   favoriteItems: DhikrItem[];
-  recentItems: DhikrItem[];
+  /** Du'as and whole sets, newest first — the names appear once, not per name. */
+  recentEntries: RecentEntry[];
   isFavorite: (id: string) => boolean;
   isPinned: (id: string) => boolean;
   onOpen: (item: DhikrItem, list: DhikrItem[]) => void;
@@ -35,6 +37,11 @@ interface DuaScreenProps {
   /** How many times each du'a in the category is recited before moving on. */
   categoryTarget?: number;
   onEditCategoryTarget?: (category: string) => void;
+  /** Starts one set again: its place and today's counters, nothing else. */
+  onResetCategory?: (category: string) => void;
+  categoryHasProgress?: boolean;
+  /** Where each set was left, for "Continue from" on a recent set. */
+  readingPositions?: Record<string, number>;
 }
 
 const QuickSection: React.FC<{
@@ -88,7 +95,7 @@ const DuaScreen: React.FC<DuaScreenProps> = ({
   filteredItems,
   totalCount,
   favoriteItems,
-  recentItems,
+  recentEntries,
   isFavorite,
   isPinned,
   onOpen,
@@ -99,7 +106,10 @@ const DuaScreen: React.FC<DuaScreenProps> = ({
   onReadCategory,
   categoryPosition = 0,
   categoryTarget = 1,
-  onEditCategoryTarget
+  onEditCategoryTarget,
+  onResetCategory,
+  categoryHasProgress = false,
+  readingPositions = {}
 }) => {
   const [showAll, setShowAll] = useState(false);
 
@@ -114,6 +124,8 @@ const DuaScreen: React.FC<DuaScreenProps> = ({
   };
 
   const activeMeta = hasCategory ? CATEGORY_META[selectedCategory] : null;
+  /** The recent du'as alone, so the reader's arrows walk those and skip sets. */
+  const recentItems = recentEntries.slice(0, 4).flatMap((entry) => (entry.kind === 'item' ? [entry.item] : []));
   const resuming = categoryPosition > 0 && categoryPosition < filteredItems.length;
   const noun = activeMeta?.noun ? getLocalizedText(activeMeta.noun) : getLocalizedText('du’as');
   const listTitle = hasSearch
@@ -165,7 +177,9 @@ const DuaScreen: React.FC<DuaScreenProps> = ({
                 <Heart size={15} fill={isCategoryFavorite?.(selectedCategory) ? 'currentColor' : 'none'} />
               </button>
             ) : null}
-            {onTogglePinCategory && hasCategory && !hasSearch ? (
+            {/* Not for the names: Home always carries them, with a button
+                of their own, so a pin there would change nothing. */}
+            {onTogglePinCategory && hasCategory && !hasSearch && selectedCategory !== 'names' ? (
               <button
                 onClick={() => onTogglePinCategory(selectedCategory)}
                 aria-pressed={isCategoryPinned?.(selectedCategory) ?? false}
@@ -248,15 +262,29 @@ const DuaScreen: React.FC<DuaScreenProps> = ({
           {/* Reading the set straight through, from the parent rather than only
               from a pinned row. Resumes where it was left. */}
           {onReadCategory && hasCategory && !hasSearch && filteredItems.length > 1 ? (
-            <button
-              onClick={() => onReadCategory(selectedCategory)}
-              className="flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-gold px-5 text-sm font-bold text-on-gold transition-all hover:opacity-90 active:scale-[0.99]"
-            >
-              <Play size={15} fill="currentColor" />
-              {resuming
-                ? `${getLocalizedText('Read through')} · ${getLocalizedText('continue from')} ${formatNumber(categoryPosition + 1, language)}`
-                : `${getLocalizedText('Read through')} · ${formatNumber(filteredItems.length, language)} ${noun}`}
-            </button>
+            <div className="flex items-stretch gap-2">
+              <button
+                onClick={() => onReadCategory(selectedCategory)}
+                className="flex min-h-12 min-w-0 flex-1 items-center justify-center gap-2 rounded-2xl bg-gold px-5 text-sm font-bold text-on-gold transition-all hover:opacity-90 active:scale-[0.99]"
+              >
+                <Play size={15} fill="currentColor" />
+                {resuming
+                  ? `${getLocalizedText('Read through')} · ${getLocalizedText('continue from')} ${formatNumber(categoryPosition + 1, language)}`
+                  : `${getLocalizedText('Read through')} · ${formatNumber(filteredItems.length, language)} ${noun}`}
+              </button>
+              {/* This set only. Reset All in the header clears the whole day,
+                  which is not what someone starting the names again means. */}
+              {onResetCategory && categoryHasProgress ? (
+                <button
+                  onClick={() => onResetCategory(selectedCategory)}
+                  aria-label={`${getLocalizedText('Reset')} ${listTitle}`}
+                  title={`${getLocalizedText('Reset')} ${listTitle}`}
+                  className="flex min-h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-border bg-card text-text-muted transition-all hover:border-gold/40 hover:text-gold-ink"
+                >
+                  <RotateCcw size={16} />
+                </button>
+              ) : null}
+            </div>
           ) : null}
 
           {filteredItems.length > 0 ? (
@@ -297,17 +325,40 @@ const DuaScreen: React.FC<DuaScreenProps> = ({
             />
           ) : null}
 
-          {recentItems.length > 0 ? (
-            <QuickSection
-              icon={<Clock3 size={11} />}
-              title={'Recently read'}
-              items={recentItems.slice(0, 4)}
-              language={language}
-              getLocalizedText={getLocalizedText}
-              isFavorite={isFavorite}
-              isPinned={isPinned}
-              onOpen={onOpen}
-            />
+          {/* A set read through shows as one row that picks up at the last
+              one read, rather than as the four names most recently opened. */}
+          {recentEntries.length > 0 ? (
+            <section className="space-y-2">
+              <p className="flex items-center gap-1.5 px-1 text-[10px] font-bold uppercase tracking-[0.2em] text-gold-ink">
+                <Clock3 size={11} />
+                {getLocalizedText('Recently read')}
+              </p>
+              <div className="space-y-2">
+                {recentEntries.slice(0, 4).map((entry) =>
+                  entry.kind === 'collection' ? (
+                    <CollectionRow
+                      key={entry.collection.key}
+                      collection={entry.collection}
+                      position={readingPositions[entry.collection.key] ?? 0}
+                      language={language}
+                      getLocalizedText={getLocalizedText}
+                      onOpen={(key) => (onReadCategory ? onReadCategory(key) : onCategorySelect(key))}
+                      onRestart={onResetCategory}
+                    />
+                  ) : (
+                    <DuaRow
+                      key={entry.item.id}
+                      item={entry.item}
+                      language={language}
+                      getLocalizedText={getLocalizedText}
+                      onOpen={() => onOpen(entry.item, recentItems)}
+                      isFavorite={isFavorite(entry.item.id)}
+                      isPinned={isPinned(entry.item.id)}
+                    />
+                  )
+                )}
+              </div>
+            </section>
           ) : null}
 
           <section className="space-y-3">

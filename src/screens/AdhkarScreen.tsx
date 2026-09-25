@@ -1,6 +1,8 @@
 import React from 'react';
-import { HandHelping, Quote, Sparkle, ChevronRight, Pin, Play } from 'lucide-react';
+import { HandHelping, Quote, Sparkle, ChevronRight, Play, RotateCcw } from 'lucide-react';
 import { DhikrItem, Language, LocalizedText } from '../constants';
+import { ASMA_DATA } from '../data/asmaulHusna';
+import { CATEGORY_META } from '../data/categories';
 import DhikrCard from '../components/DhikrCard';
 import { getHadithOfTheDay } from '../data/hadiths';
 import { getReflectionOfTheDay } from '../data/reflections';
@@ -52,9 +54,20 @@ interface AdhkarScreenProps {
   readingPositions?: Record<string, number>;
   onOpenCollection?: (key: string) => void;
   onRestartCollection?: (key: string) => void;
-  /** Offers the ninety-nine names when they are not pinned yet. */
-  onPinNames?: () => void;
-  namesPinned?: boolean;
+  /** The ninety-nine names, read through from Home like the routine. */
+  names?: NamesPlayback;
+}
+
+export interface NamesPlayback {
+  /** Where the reader got to, 0 when unstarted. */
+  position: number;
+  total: number;
+  /** Full rounds completed since the last reset today. */
+  rounds: number;
+  /** Anything to reset: a place, a counter or a round. */
+  hasProgress: boolean;
+  onPlay: () => void;
+  onReset: () => void;
 }
 
 const SectionHeader = ({
@@ -115,8 +128,7 @@ const AdhkarScreen: React.FC<AdhkarScreenProps> = ({
   readingPositions,
   onOpenCollection,
   onRestartCollection,
-  onPinNames,
-  namesPinned
+  names
 }) => {
   const pinnedItems = (allDhikrItems || []).filter((item) => (pinnedIds || []).includes(item.id));
 
@@ -153,20 +165,6 @@ const AdhkarScreen: React.FC<AdhkarScreenProps> = ({
   const protection = routineItems?.protection || [];
 
   const slotMeta = SLOT_META[rightNowSlot];
-
-  // Offered rather than assumed: the names are the one set most people want on
-  // this screen, and there is no other way to discover that a whole category
-  // can be pinned.
-  const suggestNames =
-    onPinNames && !namesPinned ? (
-      <button
-        onClick={onPinNames}
-        className="inline-flex min-h-11 items-center gap-2 rounded-2xl border border-border bg-card px-4 text-sm font-bold text-gold-ink transition-all hover:border-gold/40"
-      >
-        <Pin size={15} />
-        {getLocalizedText('Add Asma ul Husna')}
-      </button>
-    ) : null;
 
   return (
     <div className="w-full space-y-7 pt-3 pb-8">
@@ -224,6 +222,49 @@ const AdhkarScreen: React.FC<AdhkarScreenProps> = ({
             ? `${getLocalizedText('Continue')} · ${formatNumber(routineDone, language)} / ${formatNumber(routineTotal, language)}`
             : `${getLocalizedText('Play the routine')} · ${formatNumber(routineTotal, language)}`}
         </button>
+      ) : null}
+
+      {/* The names are a routine of their own — read most days, and ninety-nine
+          long, so rarely in one sitting. One button, resuming at the last name
+          read, with its own reset beside it: starting the names again should
+          not mean resetting the after-salah round, or the whole day. */}
+      {names ? (
+        <div className="-mt-4 flex items-stretch gap-2">
+          <button
+            onClick={names.onPlay}
+            className="flex min-h-14 min-w-0 flex-1 items-center gap-3 rounded-2xl border border-gold/40 bg-card px-4 text-start transition-all hover:border-gold active:scale-[0.99]"
+          >
+            <Play size={16} fill="currentColor" className="shrink-0 text-gold-ink" />
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-sm font-bold text-text-main">
+                {getLocalizedText(CATEGORY_META.names)}
+              </span>
+              <span className="mt-0.5 block truncate text-xs text-text-sub">
+                {names.position > 0
+                  ? `${getLocalizedText('Continue from')} ${formatNumber(names.position + 1, language)} · ${getLocalizedText(ASMA_DATA[names.position]?.title)}`
+                  : `${formatNumber(names.total, language)} ${getLocalizedText(CATEGORY_META.names.noun)}`}
+                {names.rounds > 0
+                  ? ` · ${getLocalizedText('Rounds today')} ${formatNumber(names.rounds, language)}`
+                  : ''}
+              </span>
+            </span>
+            {names.position > 0 ? (
+              <span className="shrink-0 text-[10px] font-bold tabular-nums text-gold-ink">
+                {formatNumber(names.position + 1, language)}/{formatNumber(names.total, language)}
+              </span>
+            ) : null}
+          </button>
+          {names.hasProgress ? (
+            <button
+              onClick={names.onReset}
+              aria-label={`${getLocalizedText('Reset')} ${getLocalizedText(CATEGORY_META.names)}`}
+              title={`${getLocalizedText('Reset')} ${getLocalizedText(CATEGORY_META.names)}`}
+              className="flex min-h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-border bg-card text-text-muted transition-all hover:border-gold/40 hover:text-gold-ink"
+            >
+              <RotateCcw size={18} />
+            </button>
+          ) : null}
+        </div>
       ) : null}
 
       <section>
@@ -312,15 +353,9 @@ const AdhkarScreen: React.FC<AdhkarScreenProps> = ({
                   {getLocalizedText('Browse du\'as')}
                 </button>
               ) : null}
-              {suggestNames}
             </div>
           </div>
         )}
-        {/* Kept discoverable once other things are pinned too — otherwise the
-            offer only ever appears on an empty screen. */}
-        {(pinnedItems.length > 0 || pinnedCollections.length > 0) && suggestNames ? (
-          <div className="mt-3">{suggestNames}</div>
-        ) : null}
       </section>
 
       <div className="pt-1">

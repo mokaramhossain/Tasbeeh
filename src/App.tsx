@@ -70,6 +70,7 @@ import BackupModal from './components/BackupModal';
 import UpdatePrompt from './components/UpdatePrompt';
 import FirstRunSetup from './components/FirstRunSetup';
 import InstallPrompt from './components/InstallPrompt';
+import type { RecentEntry } from './components/CollectionRow';
 import useBackNavigation from './hooks/useBackNavigation';
 
 // Screens
@@ -85,6 +86,7 @@ type PersonalSection = { id: string; name: LocalizedText };
 type ConfirmAction =
   | { type: 'reset-all' }
   | { type: 'reset-routine' }
+  | { type: 'reset-collection'; key: string }
   | { type: 'delete-item'; id: string }
   | { type: 'delete-section'; id: string };
 
@@ -131,6 +133,10 @@ const EMPTY_DRAFT: ManualDraft = {
 };
 
 const DEFAULT_SECTIONS: PersonalSection[] = [{ id: 'all', name: 'All Items' }];
+
+/** The category the names are filed under, and their recent-list entry. */
+const NAMES_KEY = 'names';
+const recentKey = (id: string) => (isAsmaId(id) ? `${CATEGORY_PIN}${NAMES_KEY}` : id);
 
 /** Reads one language out of a stored value without falling back to the other. */
 const localeField = (value: LocalizedText | undefined, lang: Language): string =>
@@ -324,7 +330,13 @@ export default function App() {
   const [showTranslation, setShowTranslation] = useState<boolean>(() => readJSON('dhikr-show-translation-v1', true));
   // Most people return to the same handful of du'as; this saves hunting for
   // them again. Ids only, newest first, capped.
-  const [recentIds, setRecentIds] = useState<string[]>(() => readJSON<string[]>('dhikr-recent-v1', [], isStringArray));
+  //
+  // The names are kept as one entry, `cat:names`, rather than one per name:
+  // reading through the ninety-nine filled "Recently read" with names and
+  // pushed everything else out. Lists stored before that are folded on read.
+  const [recentIds, setRecentIds] = useState<string[]>(() => [
+    ...new Set(readJSON<string[]>('dhikr-recent-v1', [], isStringArray).map(recentKey))
+  ]);
   const [shareStatus, setShareStatus] = useState<string | null>(null);
   const [updatePending, setUpdatePending] = useState(false);
   // Re-evaluated on the same signals as the date rollover — reopening the app,
@@ -769,11 +781,6 @@ export default function App() {
     [nowSlot, itemsById]
   );
 
-  const recentItems = useMemo(
-    () => recentIds.map((id) => itemsById.get(id)).filter(Boolean) as DhikrItem[],
-    [recentIds, itemsById]
-  );
-
   const handleShare = useCallback(
     async (item: DhikrItem) => {
       const text = formatDuaAsText(item, t, PLAY_STORE_URL);
@@ -901,7 +908,18 @@ export default function App() {
   /** The same, for the Saved tab. */
   const favouriteCollections = useMemo(() => resolveCollections(favorites), [favorites, resolveCollections]);
 
-
+  /** Recently read, with the names as one entry that resumes where it was left. */
+  const recentEntries = useMemo(
+    () =>
+      recentIds.flatMap((id): RecentEntry[] => {
+        if (id.startsWith(CATEGORY_PIN)) {
+          return resolveCollections([id]).map((collection) => ({ kind: 'collection', collection }));
+        }
+        const item = itemsById.get(id);
+        return item ? [{ kind: 'item', item }] : [];
+      }),
+    [recentIds, itemsById, resolveCollections]
+  );
 
   const toggleFavorite = useCallback(
     (id: string) => {
@@ -1003,6 +1021,26 @@ export default function App() {
     });
   }, [askConfirm, t]);
 
+  /**
+   * Start one collection again — the names, or any category read through.
+   *
+   * Clears its place and its counters for today, the round marker with the
+   * names, and nothing else: the routine and every other du'a keep their
+   * counts. As with every reset, the Record keeps what was recited.
+   */
+  const handleResetCollection = useCallback(
+    (key: string) => {
+      const name = CATEGORY_LABELS[key] ? t(CATEGORY_LABELS[key]) : key;
+      askConfirm(
+        // A placeholder rather than "Reset" + name: Bangla puts the verb last.
+        t('Reset {name}?').replace('{name}', name),
+        t('Starts again from the first, with its counters at zero. Your record keeps what you have already recited.'),
+        { type: 'reset-collection', key }
+      );
+    },
+    [askConfirm, t]
+  );
+
   const handleDeletePersonalItem = useCallback(
     (id: string) => {
       askConfirm(t('Delete Item?'), t('Are you sure you want to remove this item from your collection?'), {
@@ -1040,6 +1078,16 @@ export default function App() {
         routineIds.forEach((id) => { values[id] = raw[id] || 0; });
         return { date: currentDate, values };
       });
+    } else if (action.type === 'reset-collection') {
+      const ids = DUA_TAB_DATA.filter((item) => item.cat?.includes(action.key)).map((item) => item.id);
+      if (action.key === NAMES_KEY) ids.push(ASMA_CYCLE_ITEM.id);
+      setResetBaseline((prev) => {
+        const raw = counts[currentDate] || {};
+        const values = prev.date === currentDate ? { ...prev.values } : {};
+        ids.forEach((id) => { values[id] = raw[id] || 0; });
+        return { date: currentDate, values };
+      });
+      setReadingPositions((prev) => ({ ...prev, [action.key]: 0 }));
     } else if (action.type === 'delete-item') {
       setCustomItems((prev) => prev.filter((item) => item.id !== action.id));
       setFavorites((prev) => prev.filter((id) => id !== action.id));
@@ -1060,7 +1108,7 @@ export default function App() {
     }
 
     closeOverlay();
-  }, [overlay, currentDate, routineIds, closeOverlay]);
+  }, [overlay, counts, currentDate, routineIds, closeOverlay]);
 
   const handleMoveToCollection = useCallback((itemId: string, sectionId: string) => {
     setCustomItems((prev) => prev.map((item) => (item.id === itemId ? { ...item, sectionId } : item)));
@@ -1214,7 +1262,8 @@ export default function App() {
   );
 
   const rememberRead = useCallback((id: string) => {
-    setRecentIds((prev) => [id, ...prev.filter((entry) => entry !== id)].slice(0, 12));
+    const key = recentKey(id);
+    setRecentIds((prev) => [key, ...prev.filter((entry) => entry !== key)].slice(0, 12));
   }, []);
 
   const openFocus = useCallback((
@@ -1230,7 +1279,12 @@ export default function App() {
     // stopping dead at the ninety-ninth. Derived from the list itself, so no
     // screen has to know about it.
     const cycle = ids.length > 1 && ids.every(isAsmaId);
-    setOverlay({ kind: 'focus', ids, index, cycle, category, playthrough });
+    // Opening one name from the full list of ninety-nine is reading the set,
+    // so it keeps the set's place too: "Continue from" on Home and in Recently
+    // read then points at the last name actually read, however it was reached.
+    // Only the full list — an index into search results means nothing there.
+    const key = category ?? (cycle && ids.length === ASMA_DATA.length ? NAMES_KEY : undefined);
+    setOverlay({ kind: 'focus', ids, index, cycle, category: key, playthrough });
   }, [rememberRead]);
 
   /**
@@ -1280,6 +1334,19 @@ export default function App() {
       openFocus(items[index], items, key, true);
     },
     [readingPositions, openFocus]
+  );
+
+  /**
+   * Whether a collection has anything to reset today: a place to resume from,
+   * or a counter above zero. Offering "reset" on an untouched set is noise.
+   */
+  const collectionHasProgress = useCallback(
+    (key: string) => {
+      if ((readingPositions[key] ?? 0) > 0) return true;
+      if (key === NAMES_KEY && (currentCounts[ASMA_CYCLE_ITEM.id] || 0) > 0) return true;
+      return DUA_TAB_DATA.some((item) => item.cat?.includes(key) && (currentCounts[item.id] || 0) > 0);
+    },
+    [readingPositions, currentCounts]
   );
 
   const restartCollection = useCallback((key: string) => {
@@ -1422,15 +1489,16 @@ export default function App() {
     });
   }, [currentDate, language]);
 
-  const overlayShell = 'fixed inset-0 overflow-y-auto bg-bg/90 backdrop-blur-sm';
+  const overlayShell = 'fixed inset-0 overflow-y-auto bg-bg/90 backdrop-blur-sm pt-safe';
   const inputClass =
     'w-full bg-bg border border-border rounded-xl p-3 text-sm text-text-main outline-none focus:border-gold';
   const labelClass = 'block text-[10px] font-bold text-text-sub uppercase mb-1';
 
   return (
     <div className="min-h-screen bg-bg text-text-main font-serif pb-24 transition-colors duration-500">
+      <div className="status-bar-fill" aria-hidden="true" />
       {/* Header */}
-      <header className="relative bg-card border-b border-border px-4 py-6 shadow-sm">
+      <header className="relative bg-card border-b border-border px-4 pb-6 header-safe shadow-sm">
         <div className="flex justify-between items-center max-w-3xl mx-auto">
           <div className="flex items-center gap-3">
             <div className="flex flex-col">
@@ -1502,12 +1570,20 @@ export default function App() {
               currentDate={currentDate}
               rightNowItems={rightNowItems}
               rightNowSlot={nowSlot}
-              pinnedCollections={pinnedCollections}
+              // The names have their own button on Home, so a pinned copy
+              // would only list them twice.
+              pinnedCollections={pinnedCollections.filter((collection) => collection.key !== NAMES_KEY)}
               readingPositions={readingPositions}
               onOpenCollection={openCategory}
               onRestartCollection={restartCollection}
-              onPinNames={() => togglePinCategory('names')}
-              namesPinned={isCategoryPinned('names')}
+              names={{
+                position: Math.min(readingPositions[NAMES_KEY] ?? 0, ASMA_DATA.length - 1),
+                total: ASMA_DATA.length,
+                rounds: currentCounts[ASMA_CYCLE_ITEM.id] || 0,
+                hasProgress: collectionHasProgress(NAMES_KEY),
+                onPlay: () => openCollection(NAMES_KEY),
+                onReset: () => handleResetCollection(NAMES_KEY)
+              }}
               onOpenItem={openFocus}
               showTransliteration={showTransliteration}
               showTranslation={showTranslation}
@@ -1527,7 +1603,10 @@ export default function App() {
               filteredItems={filteredDuaItems}
               totalCount={DUA_TAB_DATA.length}
               favoriteItems={duaFavoriteItems}
-              recentItems={recentItems}
+              recentEntries={recentEntries}
+              onResetCategory={handleResetCollection}
+              categoryHasProgress={collectionHasProgress(duaSelectedCategory)}
+              readingPositions={readingPositions}
               isFavorite={(id) => favorites.includes(id)}
               isPinned={(id) => pinnedIds.includes(id)}
               onOpen={openFocus}
@@ -2096,7 +2175,7 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[120] overflow-y-auto bg-bg/95 backdrop-blur-md"
+            className="fixed inset-0 z-[120] overflow-y-auto bg-bg/95 backdrop-blur-md pt-safe"
             role="dialog"
             aria-modal="true"
           >

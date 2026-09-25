@@ -119,6 +119,9 @@ export const applyTheme = (
   // too tight for a du'a someone is reading aloud.
   root.style.setProperty('--reading-leading', String(readingLeading));
   root.style.colorScheme = dark ? 'dark' : 'light';
+  // iOS prints the status bar in white over an installed app, whatever the
+  // theme, so the strip behind it stays dark on the light theme.
+  root.style.setProperty('--status-bar', dark ? palette.card : '#0B1410');
 
   // Keep the browser/OS chrome (status bar, address bar) in sync with the theme.
   document

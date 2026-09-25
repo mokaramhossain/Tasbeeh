@@ -1,15 +1,21 @@
 import { DhikrItem } from '../constants';
 
 /**
- * The ninety-nine names, in the order of the narration in at-Tirmidhi.
+ * The ninety-nine names, in the order of the narration in at-Tirmidhi (3507).
  *
  * On provenance: the Quranic instruction is unambiguous — "To Allah belong the
  * most beautiful names, so call upon Him by them" (7:180) — and every name here
  * is attested. The specific enumeration of exactly ninety-nine, however, comes
  * from a narration many scholars read as a narrator's list rather than the
- * Prophet's ﷺ own words, and other lists differ slightly. So the citation on
- * every entry is 7:180 — the principle, which is certain — and the caveat is
- * stated once on the first name rather than asserted away.
+ * Prophet's ﷺ own words, and other lists differ slightly. That caveat, and
+ * 7:180 itself, sit once on the category rather than on every name.
+ *
+ * Each name cites where it is found: a verse in which the name itself is said
+ * of Allah, or — for the names the Qur'an has only as a verb (al-Qabid,
+ * al-Mu'izz, al-Mumeet) or not at all — the narration that lists it. The same
+ * 7:180 printed ninety-nine times said nothing about any one of them. The
+ * verses are chosen in scripts/names.mjs and checked against the Qur'an text
+ * by scripts/verify-name-verses.mjs.
  *
  * Bangla names and meanings are a reviewed human translation, not machine
  * output — the transliterations in particular are a pronunciation aid, and
@@ -36,7 +42,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'ar-rahman'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '59:22'
   },
   {
     step: 3,
@@ -49,7 +55,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'ar-raheem'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '59:22'
   },
   {
     step: 3,
@@ -62,7 +68,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-malik'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '59:23'
   },
   {
     step: 3,
@@ -75,7 +81,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-quddus'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '59:23'
   },
   {
     step: 3,
@@ -88,7 +94,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'as-salam'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '59:23'
   },
   {
     step: 3,
@@ -101,7 +107,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-mu\'min'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '59:23'
   },
   {
     step: 3,
@@ -114,7 +120,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-muhaymin'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '59:23'
   },
   {
     step: 3,
@@ -127,7 +133,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-azeez'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '59:23'
   },
   {
     step: 3,
@@ -140,7 +146,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-jabbar'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '59:23'
   },
   {
     step: 3,
@@ -153,7 +159,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-mutakabbir'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '59:23'
   },
   {
     step: 3,
@@ -166,7 +172,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-khaliq'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '59:24'
   },
   {
     step: 3,
@@ -179,7 +185,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-bari\''],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '59:24'
   },
   {
     step: 3,
@@ -192,7 +198,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-musawwir'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '59:24'
   },
   {
     step: 3,
@@ -205,7 +211,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-ghaffar'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '38:66'
   },
   {
     step: 3,
@@ -218,7 +224,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-qahhar'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '13:16'
   },
   {
     step: 3,
@@ -231,7 +237,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-wahhab'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '3:8'
   },
   {
     step: 3,
@@ -244,7 +250,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'ar-razzaq'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '51:58'
   },
   {
     step: 3,
@@ -257,7 +263,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-fattah'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '34:26'
   },
   {
     step: 3,
@@ -270,7 +276,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-aleem'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '2:32'
   },
   {
     step: 3,
@@ -282,8 +288,8 @@ export const ASMA_DATA: DhikrItem[] = [
     cat: ['names'],
     tags: ['asmaul-husna', 'names', 'al-qabid'],
     target: 0,
-    source: 'Quran',
-    ref: '7:180'
+    source: 'At-Tirmidhi',
+    ref: '3507'
   },
   {
     step: 3,
@@ -295,8 +301,8 @@ export const ASMA_DATA: DhikrItem[] = [
     cat: ['names'],
     tags: ['asmaul-husna', 'names', 'al-basit'],
     target: 0,
-    source: 'Quran',
-    ref: '7:180'
+    source: 'At-Tirmidhi',
+    ref: '3507'
   },
   {
     step: 3,
@@ -308,8 +314,8 @@ export const ASMA_DATA: DhikrItem[] = [
     cat: ['names'],
     tags: ['asmaul-husna', 'names', 'al-khafid'],
     target: 0,
-    source: 'Quran',
-    ref: '7:180'
+    source: 'At-Tirmidhi',
+    ref: '3507'
   },
   {
     step: 3,
@@ -321,8 +327,8 @@ export const ASMA_DATA: DhikrItem[] = [
     cat: ['names'],
     tags: ['asmaul-husna', 'names', 'ar-rafi\''],
     target: 0,
-    source: 'Quran',
-    ref: '7:180'
+    source: 'At-Tirmidhi',
+    ref: '3507'
   },
   {
     step: 3,
@@ -334,8 +340,8 @@ export const ASMA_DATA: DhikrItem[] = [
     cat: ['names'],
     tags: ['asmaul-husna', 'names', 'al-mu\'izz'],
     target: 0,
-    source: 'Quran',
-    ref: '7:180'
+    source: 'At-Tirmidhi',
+    ref: '3507'
   },
   {
     step: 3,
@@ -347,8 +353,8 @@ export const ASMA_DATA: DhikrItem[] = [
     cat: ['names'],
     tags: ['asmaul-husna', 'names', 'al-mudhill'],
     target: 0,
-    source: 'Quran',
-    ref: '7:180'
+    source: 'At-Tirmidhi',
+    ref: '3507'
   },
   {
     step: 3,
@@ -361,7 +367,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'as-samee\''],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '42:11'
   },
   {
     step: 3,
@@ -374,7 +380,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-baseer'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '42:11'
   },
   {
     step: 3,
@@ -386,8 +392,8 @@ export const ASMA_DATA: DhikrItem[] = [
     cat: ['names'],
     tags: ['asmaul-husna', 'names', 'al-hakam'],
     target: 0,
-    source: 'Quran',
-    ref: '7:180'
+    source: 'At-Tirmidhi',
+    ref: '3507'
   },
   {
     step: 3,
@@ -399,8 +405,8 @@ export const ASMA_DATA: DhikrItem[] = [
     cat: ['names'],
     tags: ['asmaul-husna', 'names', 'al-adl'],
     target: 0,
-    source: 'Quran',
-    ref: '7:180'
+    source: 'At-Tirmidhi',
+    ref: '3507'
   },
   {
     step: 3,
@@ -413,7 +419,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-lateef'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '67:14'
   },
   {
     step: 3,
@@ -426,7 +432,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-khabeer'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '67:14'
   },
   {
     step: 3,
@@ -439,7 +445,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-haleem'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '2:225'
   },
   {
     step: 3,
@@ -452,7 +458,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-azeem'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '2:255'
   },
   {
     step: 3,
@@ -465,7 +471,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-ghafoor'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '10:107'
   },
   {
     step: 3,
@@ -478,7 +484,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'ash-shakoor'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '64:17'
   },
   {
     step: 3,
@@ -491,7 +497,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-aliyy'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '2:255'
   },
   {
     step: 3,
@@ -504,7 +510,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-kabeer'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '13:9'
   },
   {
     step: 3,
@@ -517,7 +523,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-hafeez'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '11:57'
   },
   {
     step: 3,
@@ -530,7 +536,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-muqeet'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '4:85'
   },
   {
     step: 3,
@@ -543,7 +549,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-haseeb'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '4:86'
   },
   {
     step: 3,
@@ -555,8 +561,8 @@ export const ASMA_DATA: DhikrItem[] = [
     cat: ['names'],
     tags: ['asmaul-husna', 'names', 'al-jaleel'],
     target: 0,
-    source: 'Quran',
-    ref: '7:180'
+    source: 'At-Tirmidhi',
+    ref: '3507'
   },
   {
     step: 3,
@@ -569,7 +575,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-kareem'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '82:6'
   },
   {
     step: 3,
@@ -582,7 +588,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'ar-raqeeb'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '4:1'
   },
   {
     step: 3,
@@ -595,7 +601,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-mujeeb'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '11:61'
   },
   {
     step: 3,
@@ -608,7 +614,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-wasi\''],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '2:115'
   },
   {
     step: 3,
@@ -621,7 +627,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-hakeem'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '2:32'
   },
   {
     step: 3,
@@ -634,7 +640,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-wadood'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '85:14'
   },
   {
     step: 3,
@@ -647,7 +653,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-majeed'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '11:73'
   },
   {
     step: 3,
@@ -659,8 +665,8 @@ export const ASMA_DATA: DhikrItem[] = [
     cat: ['names'],
     tags: ['asmaul-husna', 'names', 'al-ba\'ith'],
     target: 0,
-    source: 'Quran',
-    ref: '7:180'
+    source: 'At-Tirmidhi',
+    ref: '3507'
   },
   {
     step: 3,
@@ -673,7 +679,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'ash-shaheed'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '22:17'
   },
   {
     step: 3,
@@ -686,7 +692,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-haqq'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '22:6'
   },
   {
     step: 3,
@@ -699,7 +705,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-wakeel'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '3:173'
   },
   {
     step: 3,
@@ -712,7 +718,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-qawiyy'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '42:19'
   },
   {
     step: 3,
@@ -725,7 +731,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-mateen'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '51:58'
   },
   {
     step: 3,
@@ -738,7 +744,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-waliyy'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '42:28'
   },
   {
     step: 3,
@@ -751,7 +757,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-hameed'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '31:26'
   },
   {
     step: 3,
@@ -763,8 +769,8 @@ export const ASMA_DATA: DhikrItem[] = [
     cat: ['names'],
     tags: ['asmaul-husna', 'names', 'al-muhsee'],
     target: 0,
-    source: 'Quran',
-    ref: '7:180'
+    source: 'At-Tirmidhi',
+    ref: '3507'
   },
   {
     step: 3,
@@ -776,8 +782,8 @@ export const ASMA_DATA: DhikrItem[] = [
     cat: ['names'],
     tags: ['asmaul-husna', 'names', 'al-mubdi\''],
     target: 0,
-    source: 'Quran',
-    ref: '7:180'
+    source: 'At-Tirmidhi',
+    ref: '3507'
   },
   {
     step: 3,
@@ -789,8 +795,8 @@ export const ASMA_DATA: DhikrItem[] = [
     cat: ['names'],
     tags: ['asmaul-husna', 'names', 'al-mu\'eed'],
     target: 0,
-    source: 'Quran',
-    ref: '7:180'
+    source: 'At-Tirmidhi',
+    ref: '3507'
   },
   {
     step: 3,
@@ -803,7 +809,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-muhyee'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '30:50'
   },
   {
     step: 3,
@@ -815,8 +821,8 @@ export const ASMA_DATA: DhikrItem[] = [
     cat: ['names'],
     tags: ['asmaul-husna', 'names', 'al-mumeet'],
     target: 0,
-    source: 'Quran',
-    ref: '7:180'
+    source: 'At-Tirmidhi',
+    ref: '3507'
   },
   {
     step: 3,
@@ -829,7 +835,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-hayy'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '2:255'
   },
   {
     step: 3,
@@ -842,7 +848,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-qayyoom'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '2:255'
   },
   {
     step: 3,
@@ -854,8 +860,8 @@ export const ASMA_DATA: DhikrItem[] = [
     cat: ['names'],
     tags: ['asmaul-husna', 'names', 'al-wajid'],
     target: 0,
-    source: 'Quran',
-    ref: '7:180'
+    source: 'At-Tirmidhi',
+    ref: '3507'
   },
   {
     step: 3,
@@ -867,8 +873,8 @@ export const ASMA_DATA: DhikrItem[] = [
     cat: ['names'],
     tags: ['asmaul-husna', 'names', 'al-majid'],
     target: 0,
-    source: 'Quran',
-    ref: '7:180'
+    source: 'At-Tirmidhi',
+    ref: '3507'
   },
   {
     step: 3,
@@ -881,7 +887,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-wahid'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '13:16'
   },
   {
     step: 3,
@@ -894,7 +900,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-ahad'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '112:1'
   },
   {
     step: 3,
@@ -907,7 +913,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'as-samad'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '112:2'
   },
   {
     step: 3,
@@ -920,7 +926,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-qadir'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '6:65'
   },
   {
     step: 3,
@@ -933,7 +939,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-muqtadir'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '54:55'
   },
   {
     step: 3,
@@ -945,8 +951,8 @@ export const ASMA_DATA: DhikrItem[] = [
     cat: ['names'],
     tags: ['asmaul-husna', 'names', 'al-muqaddim'],
     target: 0,
-    source: 'Quran',
-    ref: '7:180'
+    source: 'At-Tirmidhi',
+    ref: '3507'
   },
   {
     step: 3,
@@ -958,8 +964,8 @@ export const ASMA_DATA: DhikrItem[] = [
     cat: ['names'],
     tags: ['asmaul-husna', 'names', 'al-mu\'akhkhir'],
     target: 0,
-    source: 'Quran',
-    ref: '7:180'
+    source: 'At-Tirmidhi',
+    ref: '3507'
   },
   {
     step: 3,
@@ -972,7 +978,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-awwal'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '57:3'
   },
   {
     step: 3,
@@ -985,7 +991,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-akhir'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '57:3'
   },
   {
     step: 3,
@@ -998,7 +1004,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'az-zahir'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '57:3'
   },
   {
     step: 3,
@@ -1011,7 +1017,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-batin'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '57:3'
   },
   {
     step: 3,
@@ -1023,8 +1029,8 @@ export const ASMA_DATA: DhikrItem[] = [
     cat: ['names'],
     tags: ['asmaul-husna', 'names', 'al-walee'],
     target: 0,
-    source: 'Quran',
-    ref: '7:180'
+    source: 'At-Tirmidhi',
+    ref: '3507'
   },
   {
     step: 3,
@@ -1037,7 +1043,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-muta\'ali'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '13:9'
   },
   {
     step: 3,
@@ -1050,7 +1056,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-barr'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '52:28'
   },
   {
     step: 3,
@@ -1063,7 +1069,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'at-tawwab'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '2:37'
   },
   {
     step: 3,
@@ -1075,8 +1081,8 @@ export const ASMA_DATA: DhikrItem[] = [
     cat: ['names'],
     tags: ['asmaul-husna', 'names', 'al-muntaqim'],
     target: 0,
-    source: 'Quran',
-    ref: '7:180'
+    source: 'At-Tirmidhi',
+    ref: '3507'
   },
   {
     step: 3,
@@ -1089,7 +1095,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-afuww'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '4:43'
   },
   {
     step: 3,
@@ -1102,7 +1108,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'ar-ra\'oof'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '2:143'
   },
   {
     step: 3,
@@ -1115,7 +1121,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'malik-ul-mulk'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '3:26'
   },
   {
     step: 3,
@@ -1128,7 +1134,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'dhul-jalali wal-ikram'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '55:27'
   },
   {
     step: 3,
@@ -1140,8 +1146,8 @@ export const ASMA_DATA: DhikrItem[] = [
     cat: ['names'],
     tags: ['asmaul-husna', 'names', 'al-muqsit'],
     target: 0,
-    source: 'Quran',
-    ref: '7:180'
+    source: 'At-Tirmidhi',
+    ref: '3507'
   },
   {
     step: 3,
@@ -1154,7 +1160,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-jami\''],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '3:9'
   },
   {
     step: 3,
@@ -1167,7 +1173,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-ghaniyy'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '35:15'
   },
   {
     step: 3,
@@ -1179,8 +1185,8 @@ export const ASMA_DATA: DhikrItem[] = [
     cat: ['names'],
     tags: ['asmaul-husna', 'names', 'al-mughnee'],
     target: 0,
-    source: 'Quran',
-    ref: '7:180'
+    source: 'At-Tirmidhi',
+    ref: '3507'
   },
   {
     step: 3,
@@ -1192,8 +1198,8 @@ export const ASMA_DATA: DhikrItem[] = [
     cat: ['names'],
     tags: ['asmaul-husna', 'names', 'al-mani\''],
     target: 0,
-    source: 'Quran',
-    ref: '7:180'
+    source: 'At-Tirmidhi',
+    ref: '3507'
   },
   {
     step: 3,
@@ -1205,8 +1211,8 @@ export const ASMA_DATA: DhikrItem[] = [
     cat: ['names'],
     tags: ['asmaul-husna', 'names', 'ad-darr'],
     target: 0,
-    source: 'Quran',
-    ref: '7:180'
+    source: 'At-Tirmidhi',
+    ref: '3507'
   },
   {
     step: 3,
@@ -1218,8 +1224,8 @@ export const ASMA_DATA: DhikrItem[] = [
     cat: ['names'],
     tags: ['asmaul-husna', 'names', 'an-nafi\''],
     target: 0,
-    source: 'Quran',
-    ref: '7:180'
+    source: 'At-Tirmidhi',
+    ref: '3507'
   },
   {
     step: 3,
@@ -1232,7 +1238,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'an-noor'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '24:35'
   },
   {
     step: 3,
@@ -1245,7 +1251,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-hadee'],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '25:31'
   },
   {
     step: 3,
@@ -1258,7 +1264,7 @@ export const ASMA_DATA: DhikrItem[] = [
     tags: ['asmaul-husna', 'names', 'al-badee\''],
     target: 0,
     source: 'Quran',
-    ref: '7:180'
+    ref: '2:117'
   },
   {
     step: 3,
@@ -1270,8 +1276,8 @@ export const ASMA_DATA: DhikrItem[] = [
     cat: ['names'],
     tags: ['asmaul-husna', 'names', 'al-baqee'],
     target: 0,
-    source: 'Quran',
-    ref: '7:180'
+    source: 'At-Tirmidhi',
+    ref: '3507'
   },
   {
     step: 3,
@@ -1283,8 +1289,8 @@ export const ASMA_DATA: DhikrItem[] = [
     cat: ['names'],
     tags: ['asmaul-husna', 'names', 'al-warith'],
     target: 0,
-    source: 'Quran',
-    ref: '7:180'
+    source: 'At-Tirmidhi',
+    ref: '3507'
   },
   {
     step: 3,
@@ -1296,8 +1302,8 @@ export const ASMA_DATA: DhikrItem[] = [
     cat: ['names'],
     tags: ['asmaul-husna', 'names', 'ar-rasheed'],
     target: 0,
-    source: 'Quran',
-    ref: '7:180'
+    source: 'At-Tirmidhi',
+    ref: '3507'
   },
   {
     step: 3,
@@ -1309,8 +1315,8 @@ export const ASMA_DATA: DhikrItem[] = [
     cat: ['names'],
     tags: ['asmaul-husna', 'names', 'as-saboor'],
     target: 0,
-    source: 'Quran',
-    ref: '7:180'
+    source: 'At-Tirmidhi',
+    ref: '3507'
   }
 ];
 
