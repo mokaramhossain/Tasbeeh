@@ -12,13 +12,16 @@ import {
   Check,
   Minus,
   Plus,
-  ALargeSmall
+  ALargeSmall,
+  BookOpen
 } from 'lucide-react';
 import { DhikrItem, Language, LocalizedText } from '../constants';
 import ProgressBar from './ProgressBar';
 import { renderText } from '../utils/renderText';
 import { isTransliterationHidden, isUserAuthored, readableTransliteration } from '../utils/transliteration';
-import { formatNumber } from '../i18n';
+import { formatDigits, formatNumber } from '../i18n';
+import { isAsmaId } from '../data/asmaulHusna';
+import { NAME_HIGHLIGHT, NAME_VERSES, VERSE_TRANSLATORS } from '../data/nameVerses.generated';
 import useWakeLock from '../hooks/useWakeLock';
 
 interface FocusModeOverlayProps {
@@ -135,6 +138,14 @@ const FocusModeOverlay: React.FC<FocusModeOverlayProps> = ({
   const meaning = getLocalizedText(item.meaning);
   const benefit = getLocalizedText(item.benefit);
   const citation = [item.source, item.ref].filter(Boolean).join(', ');
+  /*
+   * A name is shown with where it is found, in place of the citation box: the
+   * verse in which it is said of Allah, with the name picked out, or — for a
+   * name cited to the narration — a line saying so rather than a bare number.
+   */
+  const isName = isAsmaId(item.id);
+  const nameVerse = isName && item.source === 'Quran' && item.ref ? NAME_VERSES[item.ref] : undefined;
+  const nameSpan = NAME_HIGHLIGHT[item.id];
 
   // Reciting a long dhikr can easily outlast the screen timeout.
   useWakeLock(true);
@@ -390,7 +401,53 @@ const FocusModeOverlay: React.FC<FocusModeOverlayProps> = ({
             </div>
           ) : null}
 
-          {benefit || citation ? (
+          {nameVerse ? (
+            <div className="rounded-2xl border border-gold/15 bg-gold/5 p-5 space-y-4">
+              <p className="flex items-center gap-1.5 text-[10px] font-bold text-gold-ink uppercase tracking-widest">
+                <BookOpen size={11} />
+                {getLocalizedText('In the Qur’an')}
+              </p>
+              <p
+                lang="ar"
+                dir="rtl"
+                className="arabic-text text-text-arabic text-right"
+                style={{ fontSize: 'calc(var(--arabic-size) * 0.85)' }}
+              >
+                {nameVerse.arabic.split(' ').map((word, i) => (
+                  <React.Fragment key={i}>
+                    {i > 0 ? ' ' : ''}
+                    {nameSpan && i >= nameSpan[0] && i <= nameSpan[1] ? (
+                      <span className="text-gold-ink font-bold">{word}</span>
+                    ) : (
+                      word
+                    )}
+                  </React.Fragment>
+                ))}
+              </p>
+              {showTranslation ? (
+                <p
+                  className="prose-block text-text-sub"
+                  style={{ fontSize: 'calc(var(--english-size) * 0.94)', lineHeight: 'var(--reading-leading)' }}
+                >
+                  {getLocalizedText(nameVerse.meaning)}
+                </p>
+              ) : null}
+              <p className="text-[10px] font-bold uppercase tracking-widest text-text-muted">
+                {getLocalizedText('Quran')} {formatDigits(item.ref ?? '', language)} ·{' '}
+                {getLocalizedText(VERSE_TRANSLATORS)}
+              </p>
+            </div>
+          ) : isName ? (
+            <div className="rounded-2xl border border-gold/15 bg-gold/5 p-5">
+              <p
+                className="prose-block text-text-sub"
+                style={{ fontSize: 'calc(var(--english-size) * 0.94)', lineHeight: 'var(--reading-leading)' }}
+              >
+                {getLocalizedText('This name is from the list narrated by at-Tirmidhi. No single verse is cited for it here.')}
+              </p>
+              <p className="mt-3 text-[10px] font-bold uppercase tracking-widest text-text-muted">{citation}</p>
+            </div>
+          ) : benefit || citation ? (
             <div className="rounded-2xl border border-gold/15 bg-gold/5 p-5">
               {benefit ? (
                 <>

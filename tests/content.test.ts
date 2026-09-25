@@ -3,6 +3,7 @@ import { ADHKAR_DATA, ADHKAR_ROUTINE } from '../src/data/adhkar';
 import { DUA_DATA } from '../src/data/duas';
 import { OCCASION_DATA } from '../src/data/occasions';
 import { ASMA_DATA } from '../src/data/asmaulHusna';
+import { NAME_HIGHLIGHT, NAME_VERSES } from '../src/data/nameVerses.generated';
 import { SURAH_TEXTS } from '../src/data/surahText';
 import { SLOT_ITEMS } from '../src/data/rightNow';
 import { CATEGORY_META } from '../src/data/categories';
@@ -164,6 +165,36 @@ describe('the names', () => {
         !(item.source === 'At-Tirmidhi' && item.ref === '3507')
     ).map((item) => `${item.id}: ${item.source} ${item.ref}`);
     expect(bad).toEqual([]);
+  });
+
+  it('every name cited to a verse has that verse, whole, in all three texts', () => {
+    const problems = ASMA_DATA.filter((item) => item.source === 'Quran').flatMap((item) => {
+      const verse = NAME_VERSES[item.ref ?? ''];
+      if (!verse) return [`${item.id}: no verse for ${item.ref}`];
+      const out: string[] = [];
+      const texts = { arabic: verse.arabic, en: verse.meaning.en, bn: verse.meaning.bn };
+      Object.entries(texts).forEach(([field, text]) => {
+        if (!text?.trim()) out.push(`${item.ref}.${field}: empty`);
+        // Scripture is never shortened to fit.
+        if (/(\.\.\.|…)/.test(text)) out.push(`${item.ref}.${field}: shortened`);
+      });
+      if (!ARABIC.test(verse.arabic)) out.push(`${item.ref}.arabic: not Arabic`);
+      if (!BENGALI.test(verse.meaning.bn)) out.push(`${item.ref}.bn: not Bengali`);
+      // Zakaria's footnotes are not shipped, so a marker would point at nothing.
+      if (/\[[০-৯0-9]+\]/.test(verse.meaning.bn)) out.push(`${item.ref}.bn: footnote marker`);
+      // The dataset prefixes verse 1 with the bismillah; it is not part of it.
+      if (/^بِسْمِ/.test(verse.arabic) && item.ref !== '1:1') out.push(`${item.ref}.arabic: starts with the bismillah`);
+      const span = NAME_HIGHLIGHT[item.id];
+      const words = verse.arabic.split(' ').length;
+      if (!span || span[0] < 0 || span[1] >= words || span[0] > span[1]) out.push(`${item.id}: highlight out of range`);
+      return out;
+    });
+    expect(problems).toEqual([]);
+  });
+
+  it('names cited to the narration carry no verse', () => {
+    const stray = ASMA_DATA.filter((item) => item.source !== 'Quran' && NAME_HIGHLIGHT[item.id]).map((item) => item.id);
+    expect(stray).toEqual([]);
   });
 });
 

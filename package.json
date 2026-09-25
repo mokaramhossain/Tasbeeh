@@ -16,6 +16,7 @@
     "data:hadiths": "node scripts/build-hadiths.mjs",
     "data:names": "node scripts/build-names.mjs",
     "data:verify-names": "node scripts/verify-name-verses.mjs",
+    "data:name-verses": "node scripts/build-name-verses.mjs",
     "i18n:todo": "node scripts/translation-todo.mjs",
     "i18n:apply": "node scripts/apply-translations.mjs",
     "shots": "node scripts/build-screenshots.mjs"

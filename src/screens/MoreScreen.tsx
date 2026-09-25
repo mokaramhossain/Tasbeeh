@@ -523,6 +523,10 @@ const MoreScreen: React.FC<MoreScreenProps> = ({
               {getLocalizedText('This app was built with a single, heartfelt purpose: to make the remembrance of Allah a seamless and beautiful part of your daily life. While we strive to organize adhkar accurately using trusted sources, please verify detailed religious matters with authentic source books and trusted scholars when needed.')}
             </p>
             <p className="text-sm leading-relaxed text-text-main">
+              <span className="font-bold text-gold-ink">{getLocalizedText('Sources:')}</span>{' '}
+              {getLocalizedText('Verses under the names: Arabic from Tanzil; English, Sahih International; Bangla, Dr. Abu Bakr Muhammad Zakaria (King Fahd Complex).')}
+            </p>
+            <p className="text-sm leading-relaxed text-text-main">
               <span className="font-bold text-gold-ink">{getLocalizedText('Your Privacy:')}</span>{' '}
               {getLocalizedText('All your dhikr counts and settings are stored locally on your own device. We do not track or store your personal worship data on our servers.')}
             </p>
