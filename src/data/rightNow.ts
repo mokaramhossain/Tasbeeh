@@ -37,8 +37,9 @@ export const SLOT_META: Record<Slot, { label: LocalizedText; icon: string; occas
  *
  * Deliberately a hand-picked list rather than a query over `tags`: tags are
  * free text with 170 distinct values, so anything derived from them surfaces
- * near-misses and the strip stops being trustworthy. Three at most — this is a
- * nudge, not a second catalogue. Ids are resolved through `itemsById` and
+ * near-misses and the strip stops being trustworthy. Each list is in priority
+ * order and only the first two are shown (see `slotItems`) — this is a nudge,
+ * not a second catalogue. Ids are resolved through `itemsById` and
  * filtered, so a renamed or removed item shortens the strip instead of
  * rendering a blank row.
  */
@@ -189,7 +190,12 @@ export const currentSlot = (now: Date = new Date(), offsetDays = 0): Slot => {
 };
 
 /**
- * The ids this moment offers, at most three.
+ * The ids this moment offers, at most two.
+ *
+ * Two, not three: the strip sits above the routine, and three rows pushed Play
+ * the routine down a screen that exists to be pressed. Two still leaves Friday
+ * room for the salawat *and* the hour's du'a; one would drop the morning or
+ * evening adhkar from Home every Friday.
  *
  * Friday contributes exactly **one** lead item and the hour supplies the rest.
  * Letting it contribute its whole list filled two of the three places and
@@ -202,7 +208,7 @@ export const slotItems = (slot: Slot, now: Date = new Date()): string[] => {
     slot === 'friday'
       ? [...SLOT_ITEMS.friday.slice(0, 1), ...SLOT_ITEMS[timeSlot(now)]]
       : SLOT_ITEMS[slot];
-  return [...new Set(ids)].slice(0, 3);
+  return [...new Set(ids)].slice(0, 2);
 };
 
 /** Shown under an occasion strip, never under a time-of-day one. */
