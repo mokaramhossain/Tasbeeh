@@ -2242,10 +2242,10 @@ export const DUA_DATA: DhikrItem[] = [
       bn: "হে আমাদের রব, আমরা আপনার উপরই ভরসা করেছি, আপনার দিকেই ফিরে এসেছি, এবং আপনার কাছেই চূড়ান্ত প্রত্যাবর্তন।\nহে আমাদের রব, জালিমদের জন্য আমাদের পরীক্ষা বানাবেন না,\nএবং আপনার রহমতে আমাদেরকে কাফিরদের হাত থেকে রক্ষা করুন।"
     },
     benefit: {
-      en: "From the example of Ibrahim alayhi as-salam and those with him: reliance on Allah, turning to Him, and asking not to be made a trial for the wrongdoers. It asks that one's weakness not become an argument against faith. Said under oppression.",
-      bn: "ইবরাহিম আলাইহিস সালাম ও তাঁর সঙ্গীদের আদর্শ থেকে: আল্লাহর ওপর ভরসা, তাঁর দিকে প্রত্যাবর্তন এবং জালিমদের জন্য পরীক্ষার পাত্র না বানানোর প্রার্থনা। এতে চাওয়া হয়, নিজের দুর্বলতা যেন ঈমানের বিরুদ্ধে যুক্তি না হয়। জুলুমের সময় পড়ুন।"
+      en: "Two Qur'anic du'as together: the reliance of Ibrahim alayhi as-salam and those with him (60:4), and the plea of the people of Musa alayhi as-salam not to be made a trial for the wrongdoers, and to be saved by His mercy (10:85-86). It asks that one's weakness not become an argument against faith. Said under oppression.",
+      bn: "দুটি কুরআনি দোয়া একসাথে: ইবরাহিম আলাইহিস সালাম ও তাঁর সঙ্গীদের আল্লাহর ওপর ভরসা (৬০:৪), এবং মুসা আলাইহিস সালামের কওমের প্রার্থনা যেন তাদের জালিমদের জন্য পরীক্ষার পাত্র বানানো না হয় ও তাঁর রহমতে মুক্তি দেওয়া হয় (১০:৮৫-৮৬)। এতে চাওয়া হয়, নিজের দুর্বলতা যেন ঈমানের বিরুদ্ধে যুক্তি না হয়। জুলুমের সময় পড়ুন।"
     },
-    ref: "60:4-5",
+    ref: "60:4; 10:85-86",
     target: 0,
     source: "Quran",
     badge: {
