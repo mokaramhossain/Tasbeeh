@@ -94,11 +94,12 @@ const SWIPE_DOMINANCE = 1.5;
 /** How far a finger may travel and still be a tap rather than a scroll. */
 const TAP_SLOP = 10;
 /**
- * After the du'a on screen changes, taps and swipes wait this long.
+ * After the reader moves itself on, taps and swipes wait this long.
  *
  * The reader moves itself on a second after a du'a is finished, and a tap
  * meant as one more count on the old du'a could otherwise land on the new
- * one, or swipe past it.
+ * one, or swipe past it. A move you made yourself does not wait: tapping
+ * through the names, or swiping through du'as, is deliberate every time.
  */
 const SETTLE_MS = 400;
 
@@ -139,7 +140,19 @@ const FocusModeOverlay: React.FC<FocusModeOverlayProps> = ({
   // is meaningful — refusing the main gesture while displaying its result was
   // the inconsistency. The accident is prevented below instead, at its real
   // cause, which was never "no target" but "a scroll is not a tap".
-  const bodyAction = onAdvanceTap ?? onIncrement;
+  // Set when you move the reader, cleared when you count, so the du'a
+  // changing without it set is the reader moving itself on.
+  const movedByYou = useRef(false);
+  const go = (move?: () => void) => {
+    if (!move) return;
+    movedByYou.current = true;
+    move();
+  };
+  const addCount = () => {
+    movedByYou.current = false;
+    onIncrement();
+  };
+  const bodyAction = onAdvanceTap ? () => go(onAdvanceTap) : addCount;
   const progress = target > 0 ? Math.min(Math.round((count / target) * 100), 100) : 0;
   const stop = (e: React.MouseEvent | React.TouchEvent) => e.stopPropagation();
   const isShortArabic = (item.arabic || '').length <= SHORT_ARABIC_LIMIT;
@@ -192,9 +205,9 @@ const FocusModeOverlay: React.FC<FocusModeOverlayProps> = ({
         event.preventDefault();
         bodyAction();
       } else if (event.key === 'ArrowLeft' && hasPrev) {
-        onPrev?.();
+        go(onPrev);
       } else if (event.key === 'ArrowRight' && hasNext) {
-        onNext?.();
+        go(onNext);
       }
     };
     window.addEventListener('keydown', handleKey);
@@ -217,6 +230,10 @@ const FocusModeOverlay: React.FC<FocusModeOverlayProps> = ({
   useEffect(() => {
     if (firstItem.current) {
       firstItem.current = false;
+      return;
+    }
+    if (movedByYou.current) {
+      movedByYou.current = false;
       return;
     }
     settledAt.current = Date.now() + SETTLE_MS;
@@ -246,8 +263,8 @@ const FocusModeOverlay: React.FC<FocusModeOverlayProps> = ({
     if (!isSwipe) return;
     const wentLeft = offset.x < 0;
     const wentRight = offset.x > 0;
-    if (wentLeft && hasNext) onNext?.();
-    else if (wentRight && hasPrev) onPrev?.();
+    if (wentLeft && hasNext) go(onNext);
+    else if (wentRight && hasPrev) go(onPrev);
   };
 
   return (
@@ -552,7 +569,7 @@ const FocusModeOverlay: React.FC<FocusModeOverlayProps> = ({
         ) : null}
         <div className="max-w-xl mx-auto flex items-center gap-3">
           <button
-            onClick={(e) => { stop(e); onPrev?.(); }}
+            onClick={(e) => { stop(e); go(onPrev); }}
             disabled={!hasPrev}
             className="w-16 h-16 bg-bg rounded-3xl border border-border flex items-center justify-center text-text-main active:scale-95 transition-all disabled:opacity-30"
             aria-label={getLocalizedText('Previous dhikr')}
@@ -560,7 +577,7 @@ const FocusModeOverlay: React.FC<FocusModeOverlayProps> = ({
             <ChevronLeft size={28} />
           </button>
           <button
-            onClick={(e) => { stop(e); if (!settling()) onIncrement(); }}
+            onClick={(e) => { stop(e); if (!settling()) addCount(); }}
             className="flex-1 h-16 bg-gold rounded-3xl flex items-center justify-center text-on-gold active:scale-95 transition-all shadow-lg"
           >
             <span className="text-xl font-bold uppercase tracking-[0.18em]">
@@ -568,7 +585,7 @@ const FocusModeOverlay: React.FC<FocusModeOverlayProps> = ({
             </span>
           </button>
           <button
-            onClick={(e) => { stop(e); onNext?.(); }}
+            onClick={(e) => { stop(e); go(onNext); }}
             disabled={!hasNext}
             className="w-16 h-16 bg-bg rounded-3xl border border-border flex items-center justify-center text-text-main active:scale-95 transition-all disabled:opacity-30"
             aria-label={getLocalizedText('Next dhikr')}
