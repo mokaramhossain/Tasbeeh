@@ -1,5 +1,5 @@
 import React from 'react';
-import { HandHelping, Quote, Sparkle, ChevronRight, Play, RotateCcw } from 'lucide-react';
+import { HandHelping, Quote, Sparkle, ChevronRight, Play, RotateCcw, Check } from 'lucide-react';
 import { DhikrItem, Language, LocalizedText } from '../constants';
 import { ASMA_DATA } from '../data/asmaulHusna';
 import { CATEGORY_META } from '../data/categories';
@@ -62,7 +62,7 @@ export interface NamesPlayback {
   /** Where the reader got to, 0 when unstarted. */
   position: number;
   total: number;
-  /** Full rounds completed since the last reset today. */
+  /** Full rounds completed since the last reset. */
   rounds: number;
   /** Anything to reset: a place, a counter or a round. */
   hasProgress: boolean;
@@ -163,6 +163,10 @@ const AdhkarScreen: React.FC<AdhkarScreenProps> = ({
   const core = routineItems?.core || [];
   const optional = routineItems?.optional || [];
   const protection = routineItems?.protection || [];
+  // A routine card opens the reader on the whole routine, not just its own
+  // section: from the last core du'a, Next went nowhere instead of on to
+  // Ayatul Kursi.
+  const routine = [...core, ...optional, ...protection];
 
   const slotMeta = SLOT_META[rightNowSlot];
 
@@ -213,10 +217,14 @@ const AdhkarScreen: React.FC<AdhkarScreenProps> = ({
           onClick={onPlayRoutine}
           className="flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl bg-gold px-5 text-sm font-bold text-on-gold transition-all hover:opacity-90 active:scale-[0.99]"
         >
-          <Play size={16} fill="currentColor" />
-          {routineDone > 0 && routineDone < routineTotal
-            ? `${getLocalizedText('Continue')} · ${formatNumber(routineDone, language)} / ${formatNumber(routineTotal, language)}`
-            : `${getLocalizedText('Play the routine')} · ${formatNumber(routineTotal, language)}`}
+          {/* Finished, it starts the next round: Play resets the routine and
+              begins again, so the label says that rather than "Play". */}
+          {routineDone >= routineTotal ? <Check size={16} /> : <Play size={16} fill="currentColor" />}
+          {routineDone >= routineTotal
+            ? `${getLocalizedText('Routine complete')} · ${getLocalizedText('Start a new round')}`
+            : routineDone > 0
+              ? `${getLocalizedText('Continue')} · ${formatNumber(routineDone, language)} / ${formatNumber(routineTotal, language)}`
+              : `${getLocalizedText('Play the routine')} · ${formatNumber(routineTotal, language)}`}
         </button>
       ) : null}
 
@@ -240,7 +248,7 @@ const AdhkarScreen: React.FC<AdhkarScreenProps> = ({
                   ? `${getLocalizedText('Continue from')} ${formatNumber(names.position + 1, language)} · ${getLocalizedText(ASMA_DATA[names.position]?.title)}`
                   : `${formatNumber(names.total, language)} ${getLocalizedText(CATEGORY_META.names.noun)}`}
                 {names.rounds > 0
-                  ? ` · ${getLocalizedText('Rounds today')} ${formatNumber(names.rounds, language)}`
+                  ? ` · ${getLocalizedText('Rounds')} ${formatNumber(names.rounds, language)}`
                   : ''}
               </span>
             </span>
@@ -270,7 +278,7 @@ const AdhkarScreen: React.FC<AdhkarScreenProps> = ({
           count={formatNumber(core.length, language)}
           getLocalizedText={getLocalizedText}
         />
-        <div className="space-y-4">{core.map(renderCard(core))}</div>
+        <div className="space-y-4">{core.map(renderCard(routine))}</div>
       </section>
 
       {/* Was computed in App but never rendered, so any optional adhkar added to
@@ -283,7 +291,7 @@ const AdhkarScreen: React.FC<AdhkarScreenProps> = ({
             count={formatNumber(optional.length, language)}
             getLocalizedText={getLocalizedText}
           />
-          <div className="space-y-4">{optional.map(renderCard(optional))}</div>
+          <div className="space-y-4">{optional.map(renderCard(routine))}</div>
         </section>
       ) : null}
 
@@ -297,7 +305,7 @@ const AdhkarScreen: React.FC<AdhkarScreenProps> = ({
             count={formatNumber(protection.length, language)}
             getLocalizedText={getLocalizedText}
           />
-          <div className="space-y-4">{protection.map(renderCard(protection))}</div>
+          <div className="space-y-4">{protection.map(renderCard(routine))}</div>
         </section>
       ) : null}
 
