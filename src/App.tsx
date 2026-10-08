@@ -1611,6 +1611,7 @@ export default function App() {
           {activeTab === 0 && (
             <AdhkarScreen
               routineItems={routineItems}
+              routinePlaylist={routinePlaylist}
               onPlayRoutine={playRoutine}
               routineTotal={routinePlaylist.length}
               routineDone={routineDone}

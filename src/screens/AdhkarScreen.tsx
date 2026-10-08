@@ -25,6 +25,11 @@ interface AdhkarScreenProps {
   getTarget: (item: DhikrItem) => number;
   onSetTarget: (item: DhikrItem) => void;
   routineItems: { core: DhikrItem[]; optional: DhikrItem[]; protection: DhikrItem[] };
+  /**
+   * The whole routine, in order, as Play reads it: with pinned du'as at the
+   * end when the routine includes them.
+   */
+  routinePlaylist: DhikrItem[];
   /** Reads the whole routine through, starting at the first unfinished du'a. */
   onPlayRoutine?: () => void;
   routineTotal?: number;
@@ -104,6 +109,7 @@ const AdhkarScreen: React.FC<AdhkarScreenProps> = ({
   onSetTarget,
   onResetItem,
   routineItems,
+  routinePlaylist,
   onPlayRoutine,
   routineTotal = 0,
   routineDone = 0,
@@ -165,8 +171,9 @@ const AdhkarScreen: React.FC<AdhkarScreenProps> = ({
   const protection = routineItems?.protection || [];
   // A routine card opens the reader on the whole routine, not just its own
   // section: from the last core du'a, Next went nowhere instead of on to
-  // Ayatul Kursi.
-  const routine = [...core, ...optional, ...protection];
+  // Ayatul Kursi. It is Play's own list, so a card does not stop at An-Nas
+  // when the routine goes on into pinned du'as.
+  const routine = routinePlaylist;
 
   const slotMeta = SLOT_META[rightNowSlot];
 
