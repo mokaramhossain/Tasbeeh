@@ -76,11 +76,31 @@ const READING_LIMITS = {
 } as const;
 
 const SHORT_ARABIC_LIMIT = 60;
-/** Distance or flick speed needed before a drag counts as a swipe. */
+/**
+ * What makes a drag a swipe.
+ *
+ * A swipe used to be 60px of travel *or* 400 px/s of speed, with no minimum
+ * distance, and a tap on a phone always wobbles: 4px in 10ms is already
+ * 400 px/s. So a tap could count and move on at once, or move on without
+ * counting, which is how Al-Ikhlas came to be skipped after Ayatul Kursi. A
+ * swipe now needs real travel, and a fast flick still needs SWIPE_MIN_FLICK,
+ * which is three times the tap slop, so no gesture can be both.
+ */
 const SWIPE_DISTANCE = 60;
-const SWIPE_VELOCITY = 400;
+const SWIPE_MIN_FLICK = 30;
+const SWIPE_VELOCITY = 800;
+/** Horizontal travel must beat vertical by this much, or it was a scroll. */
+const SWIPE_DOMINANCE = 1.5;
 /** How far a finger may travel and still be a tap rather than a scroll. */
 const TAP_SLOP = 10;
+/**
+ * After the du'a on screen changes, taps and swipes wait this long.
+ *
+ * The reader moves itself on a second after a du'a is finished, and a tap
+ * meant as one more count on the old du'a could otherwise land on the new
+ * one, or swipe past it.
+ */
+const SETTLE_MS = 400;
 
 const FocusModeOverlay: React.FC<FocusModeOverlayProps> = ({
   item,
@@ -191,9 +211,22 @@ const FocusModeOverlay: React.FC<FocusModeOverlayProps> = ({
    */
   const pressedAt = useRef<{ x: number; y: number } | null>(null);
 
+  // Not on first open: the tap that opened the reader is not a stray one.
+  const settledAt = useRef(0);
+  const firstItem = useRef(true);
+  useEffect(() => {
+    if (firstItem.current) {
+      firstItem.current = false;
+      return;
+    }
+    settledAt.current = Date.now() + SETTLE_MS;
+  }, [item.id]);
+  const settling = () => Date.now() < settledAt.current;
+
   const handleBodyClick = (event: React.MouseEvent) => {
     const from = pressedAt.current;
     pressedAt.current = null;
+    if (settling()) return;
     if (from && Math.hypot(event.clientX - from.x, event.clientY - from.y) > TAP_SLOP) return;
     if (window.getSelection()?.toString()) return;
     bodyAction();
@@ -205,9 +238,14 @@ const FocusModeOverlay: React.FC<FocusModeOverlayProps> = ({
    * advances, matching the on-screen arrow order.
    */
   const handleDragEnd = (_event: unknown, info: PanInfo) => {
+    if (settling()) return;
     const { offset, velocity } = info;
-    const wentLeft = offset.x < -SWIPE_DISTANCE || velocity.x < -SWIPE_VELOCITY;
-    const wentRight = offset.x > SWIPE_DISTANCE || velocity.x > SWIPE_VELOCITY;
+    const across = Math.abs(offset.x);
+    if (across < SWIPE_MIN_FLICK || across < Math.abs(offset.y) * SWIPE_DOMINANCE) return;
+    const isSwipe = across >= SWIPE_DISTANCE || Math.abs(velocity.x) >= SWIPE_VELOCITY;
+    if (!isSwipe) return;
+    const wentLeft = offset.x < 0;
+    const wentRight = offset.x > 0;
     if (wentLeft && hasNext) onNext?.();
     else if (wentRight && hasPrev) onPrev?.();
   };
@@ -522,7 +560,7 @@ const FocusModeOverlay: React.FC<FocusModeOverlayProps> = ({
             <ChevronLeft size={28} />
           </button>
           <button
-            onClick={(e) => { stop(e); onIncrement(); }}
+            onClick={(e) => { stop(e); if (!settling()) onIncrement(); }}
             className="flex-1 h-16 bg-gold rounded-3xl flex items-center justify-center text-on-gold active:scale-95 transition-all shadow-lg"
           >
             <span className="text-xl font-bold uppercase tracking-[0.18em]">
