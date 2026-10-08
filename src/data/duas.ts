@@ -287,12 +287,12 @@ export const DUA_DATA: DhikrItem[] = [
     },
     arabic: "رَبِّ اشْرَحْ لِي صَدْرِي\nوَيَسِّرْ لِي أَمْرِي\nوَاحْلُلْ عُقْدَةً مِنْ لِسَانِي\nيَفْقَهُوا قَوْلِي",
     trn: {
-      en: "Rabbi ishrah li sadri, wa yassir li amri, wahlul 'uqdatan min lisani, yafqahu qawli",
-      bn: "রব্বিশরাহ লী সদরী, ওয়া ইয়াসসির লী আমরী, ওয়াহলুল উকদাতাম মিন লিসানী, ইয়াফকাহু কাওলী"
+      en: "Rabbi ishrah li sadri,\nwa yassir li amri,\nwahlul 'uqdatan min lisani,\nyafqahu qawli",
+      bn: "রব্বিশরাহ লী সদরী,\nওয়া ইয়াসসির লী আমরী,\nওয়াহলুল উকদাতাম মিন লিসানী,\nইয়াফকাহু কাওলী"
     },
     meaning: {
-      en: "My Lord, expand for me my chest, ease for me my task, and untie the knot from my tongue so that they may understand my speech.",
-      bn: "হে আমার রব, আমার বক্ষ প্রশস্ত করুন, আমার কাজ সহজ করুন, আর আমার জিহ্বার জড়তা দূর করুন যাতে তারা আমার কথা বুঝতে পারে।"
+      en: "My Lord, expand for me my chest,\nease for me my task,\nand untie the knot from my tongue\nso that they may understand my speech.",
+      bn: "হে আমার রব, আমার বক্ষ প্রশস্ত করুন,\nআমার কাজ সহজ করুন,\nআর আমার জিহ্বার জড়তা দূর করুন\nযাতে তারা আমার কথা বুঝতে পারে।"
     },
     benefit: {
       en: "Musa alayhi as-salam asked this before going to speak to Pharaoh. He requests an expanded chest, an easier task, and a tongue that others can understand. Fitting before speaking publicly, an exam, a hard conversation, or dawah.",
@@ -1004,8 +1004,8 @@ export const DUA_DATA: DhikrItem[] = [
       bn: "আমানার-রাসূলু বিমা উনযিলা ইলাইহি মির-রব্বিহী ওয়াল-মু’মিনূন। কুল্লুন আমানা বিল্লাহি ওয়া মালা’ইকাতিহী ওয়া কুতুবিহী ওয়া রুসুলিহ। লা নুফাররিকু বাইনা আহাদিম মির-রুসুলিহ। ওয়া কালূ সামি’না ওয়া আতা’না, গুফরানাকা রব্বানা ওয়া ইলাইকাল-মাসীর।\nলা ইউকাল্লিফুল্লাহু নাফসান ইল্লা উস’আহা। লাহা মা কাসাবাত ওয়া আলাইহা মাকতাসাবাত। রব্বানা লা তুআখিযনা ইন নাসীনা আও আখতা’না। রব্বানা ওয়া লা তাহমিল আলাইনা ইসরান কামা হামালতাহু আলাল্লাযীনা মিন কাবলিনা। রব্বানা ওয়া লা তুহাম্মিলনা মা লা তাকাতা লানা বিহ। ওয়া’ফু আন্না, ওয়াগফির লানা, ওয়ারহামনা। আনতা মাওলানা ফানসুরনা আলাল-কাওমিল-কাফিরীন।"
     },
     meaning: {
-      en: "The Messenger has believed in what was revealed to him from his Lord, and so have the believers...\nOur Lord, do not burden us beyond our capacity; pardon us, forgive us, and have mercy on us.",
-      bn: "রাসূল তার প্রভুর পক্ষ থেকে যা তার কাছে নাযিল করা হয়েছে তার উপর ঈমান এনেছেন এবং মুমিনগণও। প্রত্যেকেই ঈমান এনেছে আল্লাহ্‌র উপর, তাঁর ফেরেশতাগণ, তাঁর কিতাবসমূহ এবং তাঁর রাসূলগণের উপর। আমরা তাঁর রাসূলগণের কারও মধ্যে তারতম্য করি না। আর তারা বলে: আমরা শুনেছি ও মেনে নিয়েছি। হে আমাদের রব! আপনার ক্ষমা প্রার্থনা করি এবং আপনার দিকেই প্রত্তাবর্তনস্থল। আল্লাহ্‌ কারও উপর এমন কোনো দায়িত্ব চাপিয়ে দেন না যা তার সাধ্যাতীত। সে ভাল যা উপার্জন করে তার প্রতিফল তারই, আর মন্দ যা কামাই করে তার প্রতিফল তার উপরই বর্তায়। ‘হে আমাদের রব! যদি আমরা বিস্মৃত হই অথবা ভুল করি তবে আপনি আমাদেরকে পাকড়াও করবেন না। হে আমাদের রব! আমাদের পূর্ববর্তীগণের উপর যেমন বোঝা চাপিয়ে দিয়েছিলেন আমাদের উপর তেমন বোঝা চাপিয়ে দিবেন না। হে আমাদের রব! আপনি আমাদেরকে এমন কিছু বহন করাবেন না যার সামর্থ আমাদের নেই। আর আপনি আমাদের পাপ মোচন করুন, আমাদেরকে ক্ষমা করুন, আমাদের প্রতি দয়া করুন, আপনি আমাদের অভিভাবক। অতএব, কাফির সম্প্রদায়ের বিরুদ্ধে আমাদেরকে সাহায্য করুন।’"
+      en: "The Messenger has believed in what was revealed to him from his Lord, and [so have] the believers. All of them have believed in Allah and His angels and His books and His messengers, [saying], \"We make no distinction between any of His messengers.\" And they say, \"We hear and we obey. [We seek] Your forgiveness, our Lord, and to You is the [final] destination.\"\nAllah does not charge a soul except [with that within] its capacity. It will have [the consequence of] what [good] it has gained, and it will bear [the consequence of] what [evil] it has earned. \"Our Lord, do not impose blame upon us if we have forgotten or erred. Our Lord, and lay not upon us a burden like that which You laid upon those before us. Our Lord, and burden us not with that which we have no ability to bear. And pardon us; and forgive us; and have mercy upon us. You are our protector, so give us victory over the disbelieving people.\"",
+      bn: "রাসূল তার প্রভুর পক্ষ থেকে যা তার কাছে নাযিল করা হয়েছে তার উপর ঈমান এনেছেন এবং মুমিনগণও। প্রত্যেকেই ঈমান এনেছে আল্লাহ্‌র উপর, তাঁর ফেরেশতাগণ, তাঁর কিতাবসমূহ এবং তাঁর রাসূলগণের উপর। আমরা তাঁর রাসূলগণের কারও মধ্যে তারতম্য করি না। আর তারা বলে: আমরা শুনেছি ও মেনে নিয়েছি। হে আমাদের রব! আপনার ক্ষমা প্রার্থনা করি এবং আপনার দিকেই প্রত্তাবর্তনস্থল।\nআল্লাহ্‌ কারও উপর এমন কোনো দায়িত্ব চাপিয়ে দেন না যা তার সাধ্যাতীত। সে ভাল যা উপার্জন করে তার প্রতিফল তারই, আর মন্দ যা কামাই করে তার প্রতিফল তার উপরই বর্তায়। ‘হে আমাদের রব! যদি আমরা বিস্মৃত হই অথবা ভুল করি তবে আপনি আমাদেরকে পাকড়াও করবেন না। হে আমাদের রব! আমাদের পূর্ববর্তীগণের উপর যেমন বোঝা চাপিয়ে দিয়েছিলেন আমাদের উপর তেমন বোঝা চাপিয়ে দিবেন না। হে আমাদের রব! আপনি আমাদেরকে এমন কিছু বহন করাবেন না যার সামর্থ আমাদের নেই। আর আপনি আমাদের পাপ মোচন করুন, আমাদেরকে ক্ষমা করুন, আমাদের প্রতি দয়া করুন, আপনি আমাদের অভিভাবক। অতএব, কাফির সম্প্রদায়ের বিরুদ্ধে আমাদেরকে সাহায্য করুন।’"
     },
     benefit: {
       en: "The closing verses of the longest surah, affirming the believers hearing and obeying, then asking not to be held accountable for forgetfulness or mistake and not to be burdened beyond capacity. Recited at night and as part of evening remembrance.",
@@ -1119,7 +1119,7 @@ export const DUA_DATA: DhikrItem[] = [
     },
     meaning: {
       en: "O Allah, I submit myself to You, entrust my affairs to You, turn my face to You, and rely upon You in hope and fear.\nThere is no refuge or escape from You except to You.\nI believe in Your Book which You revealed and Your Prophet whom You sent.",
-      bn: "হে আল্লাহ, আমি নিজেকে আপনার কাছে সমর্পণ করলাম, আমার সব বিষয় আপনার কাছে সোপর্দ করলাম, আমার মুখমণ্ডল আপনার দিকে ফিরালাম, আর আশা ও ভয়ের সাথে আপনার উপর নির্ভর করলাম। আপনার কাছ থেকে আশ্রয় বা মুক্তি আপনার কাছেই ছাড়া নেই। আমি আপনার অবতীর্ণ কিতাবে এবং প্রেরিত নবীতে ঈমান আনলাম।"
+      bn: "হে আল্লাহ, আমি নিজেকে আপনার কাছে সমর্পণ করলাম, আমার সব বিষয় আপনার কাছে সোপর্দ করলাম, আমার মুখমণ্ডল আপনার দিকে ফিরালাম, আর আশা ও ভয়ের সাথে আপনার উপর নির্ভর করলাম।\nআপনার কাছ থেকে আশ্রয় বা মুক্তি আপনার কাছেই ছাড়া নেই।\nআমি আপনার অবতীর্ণ কিতাবে এবং প্রেরিত নবীতে ঈমান আনলাম।"
     },
     benefit: {
       en: "A bedtime dua of complete handover: the face, the affair, and the back are all entrusted to Allah out of both hope and fear, with the admission that there is no refuge from Him except with Him. It ends by affirming belief in His Book and His Prophet. Said last thing at night.",
@@ -1590,12 +1590,12 @@ export const DUA_DATA: DhikrItem[] = [
     },
     arabic: "رَبِّ أَعُوذُ بِكَ مِنْ هَمَزَاتِ الشَّيَاطِينِ\nوَأَعُوذُ بِكَ رَبِّ أَن يَحْضُرُونِ",
     trn: {
-      en: "Rabbi a'udhu bika min hamazatish-shayatin, wa a'udhu bika Rabbi ay-yahdurun",
-      bn: "রব্বি আউযু বিকা মিন হামাযাতিশ-শায়াতীন, ওয়া আউযু বিকা রব্বি আন ইয়াহদুরূন"
+      en: "Rabbi a'udhu bika min hamazatish-shayatin,\nwa a'udhu bika Rabbi ay-yahdurun",
+      bn: "রব্বি আউযু বিকা মিন হামাযাতিশ-শায়াতীন,\nওয়া আউযু বিকা রব্বি আন ইয়াহদুরূন"
     },
     meaning: {
-      en: "My Lord, I seek refuge in You from the incitements of the devils, and I seek refuge in You, my Lord, lest they be present with me.",
-      bn: "হে আমার রব, আমি আপনার কাছে আশ্রয় চাই শয়তানদের কুমন্ত্রণা থেকে; আর আমি আপনার কাছেই আশ্রয় চাই, হে আমার রব, যাতে তারা আমার কাছে উপস্থিত না হয়।"
+      en: "My Lord, I seek refuge in You from the incitements of the devils,\nand I seek refuge in You, my Lord, lest they be present with me.",
+      bn: "হে আমার রব, আমি আপনার কাছে আশ্রয় চাই শয়তানদের কুমন্ত্রণা থেকে;\nআর আমি আপনার কাছেই আশ্রয় চাই, হে আমার রব, যাতে তারা আমার কাছে উপস্থিত না হয়।"
     },
     benefit: {
       en: "Seeking refuge from the promptings of the devils and from their very presence. The Quran teaches it as a response to inner agitation rather than outward attack. Said when whispers, intrusive thoughts, or anger rise.",
@@ -2238,8 +2238,8 @@ export const DUA_DATA: DhikrItem[] = [
       bn: "রব্বানা আলাইকা তাওয়াক্কালনা ওয়া ইলাইকা আনাবনা ওয়া ইলাইকাল-মাসীর।\nরব্বানা লা তাজ’আলনা ফিতনাতান লিল-কাওমিয-যালিমীন।\nওয়া নাজ্জিনা বিরাহমাতিকা মিনাল-কাওমিল-কাফিরীন।"
     },
     meaning: {
-      en: "Our Lord, upon You we rely, to You we turn, and to You is the final return.\nOur Lord, do not make us a trial for the wrongdoing people, and save us by Your mercy from the disbelieving people.",
-      bn: "হে আমাদের রব, আমরা আপনার উপরই ভরসা করেছি, আপনার দিকেই ফিরে এসেছি, এবং আপনার কাছেই চূড়ান্ত প্রত্যাবর্তন। হে আমাদের রব, জালিমদের জন্য আমাদের পরীক্ষা বানাবেন না, এবং আপনার রহমতে আমাদেরকে কাফিরদের হাত থেকে রক্ষা করুন।"
+      en: "Our Lord, upon You we rely, to You we turn, and to You is the final return.\nOur Lord, do not make us a trial for the wrongdoing people,\nand save us by Your mercy from the disbelieving people.",
+      bn: "হে আমাদের রব, আমরা আপনার উপরই ভরসা করেছি, আপনার দিকেই ফিরে এসেছি, এবং আপনার কাছেই চূড়ান্ত প্রত্যাবর্তন।\nহে আমাদের রব, জালিমদের জন্য আমাদের পরীক্ষা বানাবেন না,\nএবং আপনার রহমতে আমাদেরকে কাফিরদের হাত থেকে রক্ষা করুন।"
     },
     benefit: {
       en: "From the example of Ibrahim alayhi as-salam and those with him: reliance on Allah, turning to Him, and asking not to be made a trial for the wrongdoers. It asks that one's weakness not become an argument against faith. Said under oppression.",

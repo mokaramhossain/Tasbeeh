@@ -219,3 +219,23 @@ describe('backup', () => {
     expect([...stored].filter((key) => !carried.has(key)).sort()).toEqual([]);
   });
 });
+
+describe('reading line by line', () => {
+  it('every translation has as many lines as its pronunciation', () => {
+    // The pronunciation is one line per ayah (or per clause, for Ayatul
+    // Kursi), and a translation in one paragraph beneath it could not be read
+    // against it. A translation follows the same lines in every language.
+    const lines = (text: string | undefined) => (text || '').split('\n').filter((line) => line.trim()).length;
+    const mismatched = ALL.flatMap((item) => {
+      const trn = item.trn as LocalizedText | undefined;
+      const meaning = item.meaning as LocalizedText | undefined;
+      if (!trn || typeof trn !== 'object' || !meaning || typeof meaning !== 'object') return [];
+      const expected = Math.max(lines(trn.en), lines(trn.bn));
+      if (expected < 2) return [];
+      return (['en', 'bn'] as const)
+        .filter((lang) => meaning[lang] && lines(meaning[lang]) !== expected)
+        .map((lang) => `${item.id}.meaning.${lang}: ${lines(meaning[lang])} lines, pronunciation ${expected}`);
+    });
+    expect(mismatched).toEqual([]);
+  });
+});
