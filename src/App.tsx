@@ -155,6 +155,31 @@ const mergeLocalized = (existing: LocalizedText | undefined, next: string, lang:
 /** Quick-pick counts offered in the Set Target dialog. Kept odd (witr). */
 const TARGET_PRESETS = [3, 7, 11, 33, 101, 999];
 
+/**
+ * A haptic tick on an iPhone, which has no Vibration API.
+ *
+ * Unofficial, and only on iOS 18 or later: Safari plays the system haptic when
+ * a `switch` checkbox is toggled, so this toggles a hidden one. It has to run
+ * inside a tap. Apple may change it in any update; when it does nothing, the
+ * app is only as silent as it was before.
+ */
+const iosHapticTick = () => {
+  if (typeof document === 'undefined') return;
+  const label = document.createElement('label');
+  label.setAttribute('aria-hidden', 'true');
+  label.style.display = 'none';
+  const input = document.createElement('input');
+  input.type = 'checkbox';
+  input.setAttribute('switch', '');
+  label.appendChild(input);
+  document.head.appendChild(label);
+  label.click();
+  label.remove();
+};
+
+/** The counters on screen, which only a reset clears. */
+const TALLY_KEY = 'dhikr-tally-v1';
+
 /** Set once the raised reading defaults have been taken up. */
 const TYPE_DEFAULTS_KEY = 'dhikr-type-defaults-v2';
 
@@ -241,23 +266,36 @@ export default function App() {
     readJSON<Counts>('dhikr-category-target-v1', {}, isPlainObject)
   );
   /**
-   * What "Reset" has already accounted for today.
+   * What the counters show, kept until you reset them.
    *
-   * Reset used to delete from the day's counts, which also erased that day from
-   * the Record — the calendar square, the day's total, and "days with dhikr".
-   * A record of worship should not be destroyed by clearing a counter, so the
-   * counts stay and this marks where the current round began. The screens
-   * subtract it; the Record does not, and is permanent.
+   * The counters used to be the day's counts less whatever had been reset,
+   * which meant midnight emptied every one of them: a tasbeeh half done at
+   * 11:58 read zero at 12:01, and a finished routine looked unstarted. Nothing
+   * on screen should change because the clock did, so the counters are their
+   * own store now, and only a reset button clears them. The day counts still
+   * accumulate beside it, and the Record is built from those alone.
    *
-   * Held with its date so it lapses at midnight along with the day it describes.
+   * On the first run of this version it takes over what the screens showed:
+   * today's count less anything reset today. `counts` already holds its
+   * initial value here, because hooks initialise in order.
    */
-  const [resetBaseline, setResetBaseline] = useState<{ date: string; values: Counts }>(() =>
-    readJSON<{ date: string; values: Counts }>(
+  const [tally, setTally] = useState<Counts>(() => {
+    const stored = readJSON<Counts | null>(TALLY_KEY, null, isPlainObject);
+    if (stored) return stored;
+    const key = getLocalDateString();
+    const baseline = readJSON<{ date: string; values: Counts }>(
       'dhikr-reset-baseline-v1',
       { date: '', values: {} },
       isPlainObject
-    )
-  );
+    );
+    const less = baseline.date === key ? baseline.values : {};
+    const shown: Counts = {};
+    Object.entries(counts[key] || {}).forEach(([id, value]) => {
+      const left = value - (less[id] || 0);
+      if (left > 0) shown[id] = left;
+    });
+    return shown;
+  });
   /**
    * Whether a history is kept at all.
    *
@@ -492,7 +530,7 @@ export default function App() {
     setReadingPositions((prev) => (prev[category] === index ? prev : { ...prev, [category]: index }));
   }, [overlay]);
   useEffect(() => { writeJSON('dhikr-targets-v1', customTargets); }, [customTargets]);
-  useEffect(() => { writeJSON('dhikr-reset-baseline-v1', resetBaseline); }, [resetBaseline]);
+  useEffect(() => { writeJSON(TALLY_KEY, tally); }, [tally]);
   useEffect(() => { writeJSON('dhikr-category-target-v1', categoryTargets); }, [categoryTargets]);
   useEffect(() => { writeJSON('dhikr-haptic-v1', isHapticEnabled); }, [isHapticEnabled]);
   useEffect(() => { writeJSON('dhikr-sound-v1', isSoundEnabled); }, [isSoundEnabled]);
@@ -598,7 +636,11 @@ export default function App() {
     if (!audioContextRef.current) {
       audioContextRef.current = new AudioContextClass();
     }
-    if (audioContextRef.current.state === 'suspended') {
+    // Not only 'suspended': iOS puts the context into 'interrupted' when the
+    // app goes to the background or a call comes in, and checking for
+    // 'suspended' alone left the sound dead from then on. Called from a tap,
+    // so the resume is allowed.
+    if (audioContextRef.current.state !== 'running') {
       await audioContextRef.current.resume();
     }
     return audioContextRef.current;
@@ -653,10 +695,16 @@ export default function App() {
 
   const vibrate = useCallback(
     (pattern: number | number[]) => {
-      if (!isHapticEnabled) return;
-      if (typeof navigator === 'undefined' || !('vibrate' in navigator)) return;
+      if (!isHapticEnabled || typeof navigator === 'undefined') return;
       try {
-        navigator.vibrate(pattern);
+        if (typeof navigator.vibrate === 'function') {
+          navigator.vibrate(pattern);
+          return;
+        }
+        // No Vibration API: Safari on iPhone. A finished count gets a second
+        // tick, which iOS may or may not honour outside the tap itself.
+        iosHapticTick();
+        if (Array.isArray(pattern) && pattern.length > 1) window.setTimeout(iosHapticTick, 120);
       } catch {
         /* ignore */
       }
@@ -805,18 +853,17 @@ export default function App() {
     [t]
   );
 
-  const baseline = resetBaseline.date === currentDate ? resetBaseline.values : {};
+  /** What the counters show: everything since the last reset, across days. */
+  const currentCounts = tally;
 
-  /** What the counters show: the round since the last reset, not the day. */
-  const currentCounts = useMemo(() => {
-    const raw = counts[currentDate] || {};
-    if (Object.keys(baseline).length === 0) return raw;
-    const shown: Counts = {};
-    Object.entries(raw).forEach(([id, value]) => {
-      shown[id] = Math.max(0, value - (baseline[id] || 0));
+  /** Zeroes the given counters. The day counts, and so the Record, stand. */
+  const clearTally = useCallback((ids: string[]) => {
+    setTally((prev) => {
+      const next = { ...prev };
+      ids.forEach((id) => { delete next[id]; });
+      return next;
     });
-    return shown;
-  }, [counts, currentDate, baseline]);
+  }, []);
 
   /**
    * The repetition a set asks for, or 1 when it asks for none.
@@ -986,6 +1033,7 @@ export default function App() {
         vibrate(15);
       }
 
+      setTally((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
       setCounts((prev) => {
         const prevDayCounts = prev[currentDate] || {};
         return { ...prev, [currentDate]: { ...prevDayCounts, [id]: (prevDayCounts[id] || 0) + 1 } };
@@ -998,19 +1046,9 @@ export default function App() {
     [currentCounts, currentDate, currentTheme, keepRecord, vibrate, playClickSound, playSuccessSound]
   );
 
-  const handleResetItem = useCallback(
-    (id: string) => {
-      // Same rule as the other resets: the counter starts again, the record of
-      // what was already recited stands.
-      setResetBaseline((prev) => {
-        const raw = counts[currentDate] || {};
-        const values = prev.date === currentDate ? { ...prev.values } : {};
-        values[id] = raw[id] || 0;
-        return { date: currentDate, values };
-      });
-    },
-    [counts, currentDate]
-  );
+  // Same rule as the other resets: the counter starts again, the record of
+  // what was already recited stands.
+  const handleResetItem = useCallback((id: string) => clearTally([id]), [clearTally]);
 
   const askConfirm = useCallback((title: string, message: string, action: ConfirmAction) => {
     setOverlay({ kind: 'confirm', title, message, action });
@@ -1019,10 +1057,9 @@ export default function App() {
   const handleReset = useCallback(() => {
     askConfirm(
       t('Reset All Progress?'),
-      // Both halves of the old warning — "clears your counts" and "cannot be
-      // undone" — stopped being true when reset started writing a baseline
-      // instead of deleting.
-      t('Today’s counters start again from zero. Your record keeps what you have already recited.'),
+      // The Record is separate from the counters, so a reset deletes nothing
+      // it holds; and the counters are not "today's" any more.
+      t('Your counters start again from zero. Your record keeps what you have already recited.'),
       { type: 'reset-all' }
     );
   }, [askConfirm, t]);
@@ -1079,24 +1116,13 @@ export default function App() {
     const { action } = overlay;
 
     if (action.type === 'reset-all') {
-      setResetBaseline({ date: currentDate, values: { ...(counts[currentDate] || {}) } });
+      setTally({});
     } else if (action.type === 'reset-routine') {
-      // Only the routine, never the whole day: Du'a and Personal counts have
-      // nothing to do with the after-salah round.
-      setResetBaseline((prev) => {
-        const raw = counts[currentDate] || {};
-        const values = prev.date === currentDate ? { ...prev.values } : {};
-        routineIds.forEach((id) => { values[id] = raw[id] || 0; });
-        return { date: currentDate, values };
-      });
+      // Only the routine: Du'a and Saved counts have nothing to do with the
+      // after-salah round.
+      clearTally(routineIds);
     } else if (action.type === 'reset-names') {
-      const ids = [...ASMA_DATA.map((item) => item.id), ASMA_CYCLE_ITEM.id];
-      setResetBaseline((prev) => {
-        const raw = counts[currentDate] || {};
-        const values = prev.date === currentDate ? { ...prev.values } : {};
-        ids.forEach((id) => { values[id] = raw[id] || 0; });
-        return { date: currentDate, values };
-      });
+      clearTally([...ASMA_DATA.map((item) => item.id), ASMA_CYCLE_ITEM.id]);
       setReadingPositions((prev) => ({ ...prev, [NAMES_KEY]: 0 }));
     } else if (action.type === 'delete-item') {
       setCustomItems((prev) => prev.filter((item) => item.id !== action.id));
@@ -1118,7 +1144,7 @@ export default function App() {
     }
 
     closeOverlay();
-  }, [overlay, counts, currentDate, routineIds, closeOverlay]);
+  }, [overlay, clearTally, routineIds, closeOverlay]);
 
   const handleMoveToCollection = useCallback((itemId: string, sectionId: string) => {
     setCustomItems((prev) => prev.map((item) => (item.id === itemId ? { ...item, sectionId } : item)));
@@ -1310,23 +1336,33 @@ export default function App() {
     [routineIds, itemsById]
   );
 
-  const routineDone = useMemo(
-    () => routinePlaylist.filter((item) => {
+  /** Finished: counted up to a target it has. An item with no target never is. */
+  const isFinished = useCallback(
+    (item: DhikrItem) => {
       const target = getTarget(item);
       return target > 0 && (currentCounts[item.id] || 0) >= target;
-    }).length,
-    [routinePlaylist, currentCounts, getTarget]
+    },
+    [currentCounts, getTarget]
   );
 
+  const routineDone = useMemo(
+    () => routinePlaylist.filter(isFinished).length,
+    [routinePlaylist, isFinished]
+  );
+
+  /*
+   * With every du'a finished, Play starts the next round rather than reopening
+   * the first, finished, du'a. It used to do the latter, where a tap could only
+   * count past the target and the reader never moved on. The button says so
+   * ("Start a new round"), and it does what Reset for New Salah does, without
+   * asking: it is pressed five times a day.
+   */
   const playRoutine = useCallback(() => {
     if (routinePlaylist.length === 0) return;
-    const next =
-      routinePlaylist.find((item) => {
-        const target = getTarget(item);
-        return !(target > 0 && (currentCounts[item.id] || 0) >= target);
-      }) ?? routinePlaylist[0];
-    openFocus(next, routinePlaylist, ROUTINE_KEY, true);
-  }, [routinePlaylist, currentCounts, getTarget, openFocus]);
+    const next = routinePlaylist.find((item) => !isFinished(item));
+    if (!next) clearTally(routineIds);
+    openFocus(next ?? routinePlaylist[0], routinePlaylist, ROUTINE_KEY, true);
+  }, [routinePlaylist, isFinished, clearTally, routineIds, openFocus]);
 
   /**
    * Reopen a collection where the reader left it.
@@ -1412,6 +1448,25 @@ export default function App() {
     (item: DhikrItem) => {
       const target = getTarget(item);
       const current = currentCounts[item.id] || 0;
+      /*
+       * Playing the routine, a tap on a du'a that is already finished moves to
+       * the next unfinished one instead of counting past its target. Reached
+       * by the arrows, or by Play after a partial round, a finished du'a was
+       * otherwise a dead end. With nothing left unfinished the tap counts as
+       * usual, so it is never silently ignored.
+       */
+      if (overlay?.kind === 'focus' && overlay.category === ROUTINE_KEY && target > 0 && current >= target) {
+        const from = overlay.index;
+        const next = overlay.ids.findIndex((id, i) => {
+          if (i <= from) return false;
+          const entry = itemsById.get(id);
+          return entry ? !isFinished(entry) : false;
+        });
+        if (next !== -1) {
+          setOverlay((prev) => (prev?.kind === 'focus' && prev.index === from ? { ...prev, index: next } : prev));
+          return;
+        }
+      }
       const completes = target > 0 && current < target && current + 1 >= target;
       handleIncrement(item.id, target);
 
@@ -1446,7 +1501,7 @@ export default function App() {
         if (isLap) handleIncrement(ASMA_CYCLE_ITEM.id, ASMA_CYCLE_ITEM.target);
       }, 1100);
     },
-    [autoAdvance, categoryTarget, currentCounts, getTarget, handleIncrement, overlay]
+    [autoAdvance, categoryTarget, currentCounts, getTarget, handleIncrement, isFinished, itemsById, overlay]
   );
 
   /**
@@ -1556,6 +1611,7 @@ export default function App() {
           {activeTab === 0 && (
             <AdhkarScreen
               routineItems={routineItems}
+              routinePlaylist={routinePlaylist}
               onPlayRoutine={playRoutine}
               routineTotal={routinePlaylist.length}
               routineDone={routineDone}
@@ -1588,6 +1644,7 @@ export default function App() {
               names={{
                 position: Math.min(readingPositions[NAMES_KEY] ?? 0, ASMA_DATA.length - 1),
                 total: ASMA_DATA.length,
+                // Since the last reset, not since midnight.
                 rounds: currentCounts[ASMA_CYCLE_ITEM.id] || 0,
                 hasProgress: namesHaveProgress,
                 onPlay: () => openCollection(NAMES_KEY),

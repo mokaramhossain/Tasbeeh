@@ -41,7 +41,9 @@ export const BACKUP_KEYS = [
   'dhikr-routine-scope-v1',
   // Carried for the same reason as the type defaults: a restore onto a fresh
   // install must not switch "Continue to the next" on over a chosen "off".
-  'dhikr-auto-advance-default-v1'
+  'dhikr-auto-advance-default-v1',
+  // The counters on screen, which only a reset clears.
+  'dhikr-tally-v1'
 ] as const;
 
 export interface BackupFile {
@@ -87,6 +89,14 @@ export const downloadBackup = (backup: BackupFile) => {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 };
 
+/**
+ * Keys rebuilt from other stored data when they are missing. A backup made
+ * before one existed must clear it, or the device's own copy outlives the
+ * restore: the counters on screen would stay as they were instead of being
+ * rebuilt from the restored day counts.
+ */
+const DERIVED_KEYS = ['dhikr-tally-v1'] as const;
+
 export type RestoreResult = { ok: true; restored: number } | { ok: false; reason: string };
 
 export const restoreBackup = (raw: string): RestoreResult => {
@@ -125,5 +135,13 @@ export const restoreBackup = (raw: string): RestoreResult => {
   }
 
   if (restored === 0) return { ok: false, reason: 'empty' };
+  for (const key of DERIVED_KEYS) {
+    if (typeof data[key] === 'string') continue;
+    try {
+      localStorage.removeItem(key);
+    } catch {
+      /* ignore */
+    }
+  }
   return { ok: true, restored };
 };

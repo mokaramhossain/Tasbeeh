@@ -218,4 +218,52 @@ describe('backup', () => {
     const carried = new Set<string>([...BACKUP_KEYS, ...LEGACY]);
     expect([...stored].filter((key) => !carried.has(key)).sort()).toEqual([]);
   });
+
+  it('rebuilds the counters when restoring a backup made before they were stored', async () => {
+    // A backup without the counters left the device's own in place, so the
+    // screen kept today's numbers instead of the backup's. Removing them lets
+    // the app rebuild them from the restored day counts.
+    const store = new Map<string, string>();
+    const stub = {
+      getItem: (key: string) => store.get(key) ?? null,
+      setItem: (key: string, value: string) => void store.set(key, value),
+      removeItem: (key: string) => void store.delete(key)
+    };
+    const previous = (globalThis as { localStorage?: unknown }).localStorage;
+    (globalThis as { localStorage?: unknown }).localStorage = stub;
+    try {
+      const { restoreBackup } = await import('../src/utils/backup');
+      const backup = (data: Record<string, string>) => JSON.stringify({ app: 'dhikr-tracker', version: 1, data });
+
+      store.set('dhikr-tally-v1', '{"c_01":10}');
+      expect(restoreBackup(backup({ 'dhikr-tracker-v2': '{}' })).ok).toBe(true);
+      expect(store.has('dhikr-tally-v1')).toBe(false);
+
+      store.set('dhikr-tally-v1', '{"c_01":10}');
+      expect(restoreBackup(backup({ 'dhikr-tracker-v2': '{}', 'dhikr-tally-v1': '{"c_01":3}' })).ok).toBe(true);
+      expect(store.get('dhikr-tally-v1')).toBe('{"c_01":3}');
+    } finally {
+      (globalThis as { localStorage?: unknown }).localStorage = previous;
+    }
+  });
+});
+
+describe('reading line by line', () => {
+  it('every translation has as many lines as its pronunciation', () => {
+    // The pronunciation is one line per ayah (or per clause, for Ayatul
+    // Kursi), and a translation in one paragraph beneath it could not be read
+    // against it. A translation follows the same lines in every language.
+    const lines = (text: string | undefined) => (text || '').split('\n').filter((line) => line.trim()).length;
+    const mismatched = ALL.flatMap((item) => {
+      const trn = item.trn as LocalizedText | undefined;
+      const meaning = item.meaning as LocalizedText | undefined;
+      if (!trn || typeof trn !== 'object' || !meaning || typeof meaning !== 'object') return [];
+      const expected = Math.max(lines(trn.en), lines(trn.bn));
+      if (expected < 2) return [];
+      return (['en', 'bn'] as const)
+        .filter((lang) => meaning[lang] && lines(meaning[lang]) !== expected)
+        .map((lang) => `${item.id}.meaning.${lang}: ${lines(meaning[lang])} lines, pronunciation ${expected}`);
+    });
+    expect(mismatched).toEqual([]);
+  });
 });

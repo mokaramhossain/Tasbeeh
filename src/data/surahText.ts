@@ -32,8 +32,8 @@ export const SURAH_TEXTS: Record<string, SurahText> = {
       bn: 'আল্লাহু লা ইলাহা ইল্লা হুয়াল-হাইয়্যুল-কাইয়্যূম।\nলা তা’খুযুহু সিনাতুন ওয়া লা নাওম।\nলাহু মা ফিস-সামাওয়াতি ওয়া মা ফিল-আরদ।\nমান যাল্লাযী ইয়াশফা’উ ইন্দাহু ইল্লা বি-ইযনিহ।\nইয়া’লামু মা বাইনা আইদীহিম ওয়া মা খালফাহুম, ওয়া লা ইউহীতূনা বিশাই’ইম মিন ইলমিহী ইল্লা বিমা শা’।\nওয়াসি’আ কুরসিয়্যুহুস-সামাওয়াতি ওয়াল-আরদ, ওয়া লা ইয়াউদুহু হিফযুহুমা, ওয়া হুয়াল-আলিয়্যুল-আযীম।'
     },
     meaning: {
-      en: 'Allah! There is no deity except Him, the Ever-Living, the Sustainer of all existence.\nNeither drowsiness overtakes Him nor sleep.\nTo Him belongs whatever is in the heavens and whatever is on the earth.\nWho is it that can intercede with Him except by His permission?\nHe knows what is before them and what will be after them,\nand they encompass not a thing of His knowledge except for what He wills.\nHis Kursi extends over the heavens and the earth,\nand their preservation tires Him not.\nAnd He is the Most High, the Most Great.',
-      bn: 'আল্লাহ্‌, তিনি ছাড়া কোনো সত্য ইলাহ নেই। তিনি চিরঞ্জীব, সর্বসত্তার ধারক। তাঁকে তন্দ্রাও স্পর্শ করতে পারে না, নিদ্রাও নয়। আসমানসমূহে যা রয়েছে ও যমীনে যা রয়েছে সবই তাঁর। কে সে, যে তাঁর অনুমতি ব্যতীত তাঁর কাছে সুপারিশ করবে? তাদের সামনে ও পেছনে যা কিছু আছে তা তিনি জানেন। আর যা তিনি ইচ্ছে করেন তা ছাড়া তাঁর জ্ঞানের কোনো কিছুকেই তারা পরিবেষ্টন করতে পারে না। তাঁর ‘কুরসী’ আসমানসমূহ ও যমীনকে পরিব্যাপ্ত করে আছে; আর এ দুটোর রক্ষণাবেক্ষণ তাঁর জন্য বোঝা হয় না। আর তিনি সুউচ্চ সুমহান।'
+      en: 'Allah! There is no deity except Him, the Ever-Living, the Sustainer of all existence.\nNeither drowsiness overtakes Him nor sleep.\nTo Him belongs whatever is in the heavens and whatever is on the earth.\nWho is it that can intercede with Him except by His permission?\nHe knows what is before them and what will be after them, and they encompass not a thing of His knowledge except for what He wills.\nHis Kursi extends over the heavens and the earth, and their preservation tires Him not. And He is the Most High, the Most Great.',
+      bn: 'আল্লাহ্‌, তিনি ছাড়া কোনো সত্য ইলাহ নেই। তিনি চিরঞ্জীব, সর্বসত্তার ধারক।\nতাঁকে তন্দ্রাও স্পর্শ করতে পারে না, নিদ্রাও নয়।\nআসমানসমূহে যা রয়েছে ও যমীনে যা রয়েছে সবই তাঁর।\nকে সে, যে তাঁর অনুমতি ব্যতীত তাঁর কাছে সুপারিশ করবে?\nতাদের সামনে ও পেছনে যা কিছু আছে তা তিনি জানেন। আর যা তিনি ইচ্ছে করেন তা ছাড়া তাঁর জ্ঞানের কোনো কিছুকেই তারা পরিবেষ্টন করতে পারে না।\nতাঁর ‘কুরসী’ আসমানসমূহ ও যমীনকে পরিব্যাপ্ত করে আছে; আর এ দুটোর রক্ষণাবেক্ষণ তাঁর জন্য বোঝা হয় না। আর তিনি সুউচ্চ সুমহান।'
     }
   },
   ikhlas: {
@@ -45,7 +45,7 @@ export const SURAH_TEXTS: Record<string, SurahText> = {
     },
     meaning: {
       en: 'Say, \'He is Allah, [who is] One.\nAllah, the Eternal Refuge.\nHe neither begets nor is born.\nNor is there to Him any equivalent.\'',
-      bn: 'বলুন, তিনি আল্লাহ, একক। আল্লাহ অমুখাপেক্ষী। তিনি জন্ম দেননি এবং জন্মগ্রহণও করেননি। আর তাঁর সমতুল্য কেউ নেই।'
+      bn: 'বলুন, তিনি আল্লাহ, একক।\nআল্লাহ অমুখাপেক্ষী।\nতিনি জন্ম দেননি এবং জন্মগ্রহণও করেননি।\nআর তাঁর সমতুল্য কেউ নেই।'
     }
   },
   falaq: {
@@ -56,8 +56,8 @@ export const SURAH_TEXTS: Record<string, SurahText> = {
       bn: 'কুল আউযু বিরব্বিল-ফালাক।\nমিন শাররি মা খালাক।\nওয়া মিন শাররি গাসিকিন ইযা ওয়াকাব।\nওয়া মিন শাররিন-নাফফাসাতি ফিল-উকাদ।\nওয়া মিন শাররি হাসিদিন ইযা হাসাদ।'
     },
     meaning: {
-      en: 'Say, I seek refuge in the Lord of daybreak from the evil of that which He created... and from the evil of an envier when he envies.',
-      bn: 'বলুন, ‘আমি আশ্রয় প্রার্থনা করছি ঊষার রবের তিনি যা সৃষ্টি করেছেন তার অনিষ্ট হতে, আর অনিষ্ট হতে রাতের অন্ধকারের, যখন তা গভীর হয় আর অনিষ্ট হতে সমস্ত নারীদের, যারা গিরায় ফুঁক দেয়, আর অনিষ্ট হতে হিংসুকের, যখন সে হিংসা করে।’'
+      en: 'Say, \'I seek refuge in the Lord of daybreak\nFrom the evil of that which He created,\nAnd from the evil of darkness when it settles,\nAnd from the evil of the blowers in knots,\nAnd from the evil of an envier when he envies.\'',
+      bn: 'বলুন, ‘আমি আশ্রয় প্রার্থনা করছি ঊষার রবের\nতিনি যা সৃষ্টি করেছেন তার অনিষ্ট হতে,\nআর অনিষ্ট হতে রাতের অন্ধকারের, যখন তা গভীর হয়\nআর অনিষ্ট হতে সমস্ত নারীদের, যারা গিরায় ফুঁক দেয়,\nআর অনিষ্ট হতে হিংসুকের, যখন সে হিংসা করে।’'
     }
   },
   nas: {
@@ -68,8 +68,8 @@ export const SURAH_TEXTS: Record<string, SurahText> = {
       bn: 'কুল আউযু বিরব্বিন-নাস।\nমালিকিন-নাস।\nইলাহিন-নাস।\nমিন শাররিল-ওয়াসওয়াসিল-খান্নাস।\nআল্লাযী ইউওয়াসওয়িসু ফী সুদূরিন-নাস।\nমিনাল-জিন্নাতি ওয়ান-নাস।'
     },
     meaning: {
-      en: 'Say, I seek refuge in the Lord of mankind, the Sovereign of mankind, the God of mankind, from the evil of the retreating whisperer...',
-      bn: 'বলুন, ‘আমি আশ্ৰয় প্রার্থনা করছি মানুষের রবের, মানুষের অধিপতির, মানুষের ইলাহের কাছে আত্মগোপনকারী কুমন্ত্রণাদাতার অনিষ্ট হতে, যে কুমন্ত্রণা দেয় মানুষের অন্তরে, জিনের মধ্য থেকে এবং মানুষের মধ্য থেকে।’'
+      en: 'Say, \'I seek refuge in the Lord of mankind,\nThe Sovereign of mankind,\nThe God of mankind,\nFrom the evil of the retreating whisperer,\nWho whispers [evil] into the breasts of mankind,\nFrom among the jinn and mankind.\'',
+      bn: 'বলুন, ‘আমি আশ্ৰয় প্রার্থনা করছি মানুষের রবের,\nমানুষের অধিপতির,\nমানুষের ইলাহের কাছে\nআত্মগোপনকারী কুমন্ত্রণাদাতার অনিষ্ট হতে,\nযে কুমন্ত্রণা দেয় মানুষের অন্তরে,\nজিনের মধ্য থেকে এবং মানুষের মধ্য থেকে।’'
     }
   }
 };

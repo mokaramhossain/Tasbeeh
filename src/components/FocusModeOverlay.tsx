@@ -76,11 +76,32 @@ const READING_LIMITS = {
 } as const;
 
 const SHORT_ARABIC_LIMIT = 60;
-/** Distance or flick speed needed before a drag counts as a swipe. */
+/**
+ * What makes a drag a swipe.
+ *
+ * A swipe used to be 60px of travel *or* 400 px/s of speed, with no minimum
+ * distance, and a tap on a phone always wobbles: 4px in 10ms is already
+ * 400 px/s. So a tap could count and move on at once, or move on without
+ * counting, which is how Al-Ikhlas came to be skipped after Ayatul Kursi. A
+ * swipe now needs real travel, and a fast flick still needs SWIPE_MIN_FLICK,
+ * which is three times the tap slop, so no gesture can be both.
+ */
 const SWIPE_DISTANCE = 60;
-const SWIPE_VELOCITY = 400;
+const SWIPE_MIN_FLICK = 30;
+const SWIPE_VELOCITY = 800;
+/** Horizontal travel must beat vertical by this much, or it was a scroll. */
+const SWIPE_DOMINANCE = 1.5;
 /** How far a finger may travel and still be a tap rather than a scroll. */
 const TAP_SLOP = 10;
+/**
+ * After the reader moves itself on, taps and swipes wait this long.
+ *
+ * The reader moves itself on a second after a du'a is finished, and a tap
+ * meant as one more count on the old du'a could otherwise land on the new
+ * one, or swipe past it. A move you made yourself does not wait: tapping
+ * through the names, or swiping through du'as, is deliberate every time.
+ */
+const SETTLE_MS = 400;
 
 const FocusModeOverlay: React.FC<FocusModeOverlayProps> = ({
   item,
@@ -119,7 +140,19 @@ const FocusModeOverlay: React.FC<FocusModeOverlayProps> = ({
   // is meaningful — refusing the main gesture while displaying its result was
   // the inconsistency. The accident is prevented below instead, at its real
   // cause, which was never "no target" but "a scroll is not a tap".
-  const bodyAction = onAdvanceTap ?? onIncrement;
+  // Set when you move the reader, cleared when you count, so the du'a
+  // changing without it set is the reader moving itself on.
+  const movedByYou = useRef(false);
+  const go = (move?: () => void) => {
+    if (!move) return;
+    movedByYou.current = true;
+    move();
+  };
+  const addCount = () => {
+    movedByYou.current = false;
+    onIncrement();
+  };
+  const bodyAction = onAdvanceTap ? () => go(onAdvanceTap) : addCount;
   const progress = target > 0 ? Math.min(Math.round((count / target) * 100), 100) : 0;
   const stop = (e: React.MouseEvent | React.TouchEvent) => e.stopPropagation();
   const isShortArabic = (item.arabic || '').length <= SHORT_ARABIC_LIMIT;
@@ -172,9 +205,9 @@ const FocusModeOverlay: React.FC<FocusModeOverlayProps> = ({
         event.preventDefault();
         bodyAction();
       } else if (event.key === 'ArrowLeft' && hasPrev) {
-        onPrev?.();
+        go(onPrev);
       } else if (event.key === 'ArrowRight' && hasNext) {
-        onNext?.();
+        go(onNext);
       }
     };
     window.addEventListener('keydown', handleKey);
@@ -191,9 +224,26 @@ const FocusModeOverlay: React.FC<FocusModeOverlayProps> = ({
    */
   const pressedAt = useRef<{ x: number; y: number } | null>(null);
 
+  // Not on first open: the tap that opened the reader is not a stray one.
+  const settledAt = useRef(0);
+  const firstItem = useRef(true);
+  useEffect(() => {
+    if (firstItem.current) {
+      firstItem.current = false;
+      return;
+    }
+    if (movedByYou.current) {
+      movedByYou.current = false;
+      return;
+    }
+    settledAt.current = Date.now() + SETTLE_MS;
+  }, [item.id]);
+  const settling = () => Date.now() < settledAt.current;
+
   const handleBodyClick = (event: React.MouseEvent) => {
     const from = pressedAt.current;
     pressedAt.current = null;
+    if (settling()) return;
     if (from && Math.hypot(event.clientX - from.x, event.clientY - from.y) > TAP_SLOP) return;
     if (window.getSelection()?.toString()) return;
     bodyAction();
@@ -205,11 +255,16 @@ const FocusModeOverlay: React.FC<FocusModeOverlayProps> = ({
    * advances, matching the on-screen arrow order.
    */
   const handleDragEnd = (_event: unknown, info: PanInfo) => {
+    if (settling()) return;
     const { offset, velocity } = info;
-    const wentLeft = offset.x < -SWIPE_DISTANCE || velocity.x < -SWIPE_VELOCITY;
-    const wentRight = offset.x > SWIPE_DISTANCE || velocity.x > SWIPE_VELOCITY;
-    if (wentLeft && hasNext) onNext?.();
-    else if (wentRight && hasPrev) onPrev?.();
+    const across = Math.abs(offset.x);
+    if (across < SWIPE_MIN_FLICK || across < Math.abs(offset.y) * SWIPE_DOMINANCE) return;
+    const isSwipe = across >= SWIPE_DISTANCE || Math.abs(velocity.x) >= SWIPE_VELOCITY;
+    if (!isSwipe) return;
+    const wentLeft = offset.x < 0;
+    const wentRight = offset.x > 0;
+    if (wentLeft && hasNext) go(onNext);
+    else if (wentRight && hasPrev) go(onPrev);
   };
 
   return (
@@ -514,7 +569,7 @@ const FocusModeOverlay: React.FC<FocusModeOverlayProps> = ({
         ) : null}
         <div className="max-w-xl mx-auto flex items-center gap-3">
           <button
-            onClick={(e) => { stop(e); onPrev?.(); }}
+            onClick={(e) => { stop(e); go(onPrev); }}
             disabled={!hasPrev}
             className="w-16 h-16 bg-bg rounded-3xl border border-border flex items-center justify-center text-text-main active:scale-95 transition-all disabled:opacity-30"
             aria-label={getLocalizedText('Previous dhikr')}
@@ -522,7 +577,7 @@ const FocusModeOverlay: React.FC<FocusModeOverlayProps> = ({
             <ChevronLeft size={28} />
           </button>
           <button
-            onClick={(e) => { stop(e); onIncrement(); }}
+            onClick={(e) => { stop(e); if (!settling()) addCount(); }}
             className="flex-1 h-16 bg-gold rounded-3xl flex items-center justify-center text-on-gold active:scale-95 transition-all shadow-lg"
           >
             <span className="text-xl font-bold uppercase tracking-[0.18em]">
@@ -530,7 +585,7 @@ const FocusModeOverlay: React.FC<FocusModeOverlayProps> = ({
             </span>
           </button>
           <button
-            onClick={(e) => { stop(e); onNext?.(); }}
+            onClick={(e) => { stop(e); go(onNext); }}
             disabled={!hasNext}
             className="w-16 h-16 bg-bg rounded-3xl border border-border flex items-center justify-center text-text-main active:scale-95 transition-all disabled:opacity-30"
             aria-label={getLocalizedText('Next dhikr')}
